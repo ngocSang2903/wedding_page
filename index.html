@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiệp Cưới - Quốc Huy &amp; Hồng Ngọc</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Great+Vibes&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        paper: '#FBF8F3',
+                        cardbeige: '#EDE2D3',
+                        cardborder: '#DED0BD',
+                        choco: '#6E5A4F',
+                        chocodark: '#4E3D34',
+                        creamtext: '#FAF6F0',
+                        taupe: '#5C4B41',
+                        waxgold: '#C59B6D',
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        playfair: ['"Playfair Display"', 'serif'],
+                        script: ['"Great Vibes"', 'cursive'],
+                        sans: ['"Montserrat"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #E8DCCB;
+            color: #5C4B41;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Background texture from image2/Background.png */
+        .bg-castle-paper {
+            background-color: #F4ECE1;
+            background-image: url('image2/Background.png');
+            background-size: 100% auto;
+            background-position: top center;
+            background-repeat: repeat-y;
+        }
+
+        /* Warm beige textured invitation card */
+        .beige-card {
+            background-color: #EDE2D3;
+            background-image: radial-gradient(rgba(110, 90, 79, 0.04) 1px, transparent 0);
+            background-size: 14px 14px;
+            box-shadow: 0 10px 30px -5px rgba(92, 75, 65, 0.12), 0 4px 12px -2px rgba(92, 75, 65, 0.06);
+        }
+
+        /* Custom 3D Coverflow Perspective */
+        .perspective-container {
+            perspective: 1200px;
+            transform-style: preserve-3d;
+        }
+
+        .coverflow-item {
+            transition:
+                transform 0.78s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.78s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+            will-change: transform, opacity, filter;
+        }
+
+        .coverflow-item img {
+            transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .coverflow-item.is-active-slide:hover img {
+            transform: scale(1.04);
+        }
+
+        .coverflow-glare {
+            background: linear-gradient(115deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, 0.08) 100%);
+            transition: opacity 0.72s ease;
+        }
+
+        /* Subtle floating animation for dried flowers */
+        @keyframes sway {
+
+            0%,
+            100% {
+                transform: rotate(0deg) translateY(0px);
+            }
+
+            50% {
+                transform: rotate(2deg) translateY(-3px);
+            }
+        }
+
+        @keyframes swayReverse {
+
+            0%,
+            100% {
+                transform: rotate(0deg) translateY(0px);
+            }
+
+            50% {
+                transform: rotate(-2deg) translateY(-3px);
+            }
+        }
+
+        .boho-flower {
+            animation: sway 6s ease-in-out infinite;
+            pointer-events: none;
+            transform-origin: bottom center;
+        }
+
+        .boho-flower-alt {
+            animation: swayReverse 7s ease-in-out infinite;
+            pointer-events: none;
+            transform-origin: bottom center;
+        }
+
+        /* Opening Invitation Modal Overlay Transition */
+        #invitation-overlay {
+            background: radial-gradient(circle at center, #F3E9DC 0%, #E5D4C0 100%);
+            perspective: 1400px;
+            transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.9s;
+        }
+
+        #invitation-overlay.overlay-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .opening-card {
+            background: radial-gradient(circle at center, #FFFDF9 35%, #F4EBE0 100%);
+            transform-style: preserve-3d;
+            transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.85s ease, box-shadow 0.85s ease;
+            box-shadow: 0 20px 45px -10px rgba(92, 75, 65, 0.22), inset 0 0 24px rgba(197, 155, 109, 0.12);
+        }
+
+        .card-opened .opening-card {
+            transform: translateY(-28px) scale(1.08) rotateX(12deg);
+            opacity: 0;
+            box-shadow: 0 35px 70px -12px rgba(92, 75, 65, 0.35);
+        }
+
+        .opening-card .edge-flower-left {
+            transform-origin: bottom center;
+            transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .opening-card .edge-flower-right {
+            transform-origin: bottom center;
+            transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .card-opened .opening-card .edge-flower-left {
+            transform: translateX(-14px) rotate(-6deg) scale(1.05);
+        }
+
+        .card-opened .opening-card .edge-flower-right {
+            transform: translateX(14px) rotate(6deg) scale(1.05);
+        }
+
+        .seal-heart-badge {
+            position: relative;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 0 3.5px #FAF4EC, 0 0 0 5px #D2B89A, 0 6px 14px rgba(90, 68, 54, 0.25);
+        }
+
+        .seal-heart-badge::after {
+            content: '';
+            position: absolute;
+            inset: -7px;
+            border-radius: 9999px;
+            border: 1px solid rgba(197, 155, 109, 0.55);
+            animation: sealPulseRing 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes sealPulseRing {
+            0% {
+                transform: scale(0.92);
+                opacity: 0.85;
+            }
+
+            75% {
+                transform: scale(1.38);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1.38);
+                opacity: 0;
+            }
+        }
+
+        .card-opened .seal-heart-badge {
+            transform: scale(1.35) rotate(12deg);
+        }
+
+        .open-shimmer-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            border-radius: 9999px;
+            background: radial-gradient(circle, rgba(255, 250, 242, 0.9) 0%, rgba(216, 184, 148, 0.4) 50%, transparent 75%);
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 30;
+        }
+
+        .card-opened .open-shimmer-ring {
+            animation: cardBurstGlow 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes cardBurstGlow {
+            0% {
+                transform: translate(-50%, -50%) scale(0.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(26);
+                opacity: 0;
+            }
+        }
+
+        /* Hero section entrance when card opens */
+        .hero-entrance {
+            opacity: 0;
+            transform: translateY(24px) scale(0.97);
+            transition: opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1), transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .hero-entrance.hero-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Scroll reveal animations */
+        .reveal-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .reveal-section.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .revealed .reveal-item {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-100 {
+            transition-delay: 120ms;
+        }
+
+        .delay-200 {
+            transition-delay: 240ms;
+        }
+
+        .delay-300 {
+            transition-delay: 360ms;
+        }
+
+        .delay-400 {
+            transition-delay: 480ms;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F4ECE1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #6E5A4F;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-choco selection:text-creamtext overflow-hidden" id="page-body">
+
+    <!-- BACKGROUND AUDIO (Tự động phát từ folder audio/nhacnen.mp3) -->
+    <audio id="bg-music" src="audio/nhacnen.mp3" autoplay loop preload="auto">
+        <source src="audio/nhacnen.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- FALLING PETALS CANVAS -->
+    <canvas id="petals-canvas" class="fixed inset-0 pointer-events-none z-40 w-full h-full"></canvas>
+
+    <!-- FLOATING CONTROL BUTTONS (BOTTOM RIGHT) -->
+    <div class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5">
+        <!-- Replay Opening Card Button -->
+        <button onclick="replayEnvelope()" title="Xem lại màn hình mở thiệp"
+            class="w-10 h-10 rounded-full bg-paper text-choco border border-choco/30 shadow-lg flex items-center justify-center hover:bg-choco hover:text-creamtext hover:scale-105 transition-all cursor-pointer">
+            <i class="fa-solid fa-envelope-open-text text-xs"></i>
+        </button>
+        <!-- Toggle Falling Petals Button -->
+        <button id="petals-btn" onclick="togglePetals()" title="Bật/Tắt hiệu ứng cánh hoa rơi"
+            class="w-10 h-10 rounded-full bg-paper text-choco border border-choco/30 shadow-lg flex items-center justify-center hover:bg-choco hover:text-creamtext hover:scale-105 transition-all cursor-pointer">
+            <i id="petals-icon" class="fa-solid fa-spa text-xs text-choco"></i>
+        </button>
+        <!-- Toggle Music Button -->
+        <button id="music-btn" onclick="toggleMusic()" title="Bật/Tắt nhạc nền"
+            class="w-11 h-11 rounded-full bg-choco text-creamtext border border-paper shadow-xl flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
+            <i id="music-icon" class="fa-solid fa-volume-xmark text-sm"></i>
+        </button>
+    </div>
+
+    <!-- ==================== MÀN HÌNH MỞ THIỆP (GIỐNG MẪU MỚI) ==================== -->
+    <div id="invitation-overlay"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 select-none overflow-hidden">
+
+        <!-- White Cream Horizontal Card with White Rose & Baby's Breath Bouquets Rising from Bottom Corners -->
+        <div id="interactive-envelope"
+            class="opening-card relative w-full max-w-[440px] rounded-2xl border-2 border-[#D5BE9F] px-8 py-8 text-center overflow-hidden cursor-pointer"
+            onclick="openWeddingInvitation()">
+
+            <!-- Subtle Inner Gold Frame Border -->
+            <div class="absolute inset-1.5 rounded-xl border border-[#E5D4BE]/80 pointer-events-none z-20"></div>
+
+            <!-- Radial Shimmer Burst when clicked -->
+            <div class="open-shimmer-ring"></div>
+
+            <!-- Left White Rose & Baby's Breath Bouquet (Rising from Bottom-Left) -->
+            <img src="image2/hoa-mo-thiep-trai.png" alt="Hoa trắng trái"
+                class="edge-flower-left absolute left-1.5 bottom-1.5 w-[112px] sm:w-[126px] h-[85%] object-contain object-bottom pointer-events-none select-none z-10" />
+
+            <!-- Right White Rose & Baby's Breath Bouquet (Rising from Bottom-Right) -->
+            <img src="image2/hoa-mo-thiep-phai.png" alt="Hoa trắng phải"
+                class="edge-flower-right absolute right-1.5 bottom-1.5 w-[112px] sm:w-[126px] h-[82%] object-contain object-bottom pointer-events-none select-none z-10" />
+
+            <!-- Top Dark Brown Circle with Gold Double Ring & White Heart -->
+            <div
+                class="seal-heart-badge relative z-20 w-12 h-12 rounded-full bg-[#5C4436] text-white flex items-center justify-center mx-auto mb-5">
+                <i class="fa-solid fa-heart text-base"></i>
+            </div>
+
+            <!-- Couple Names -->
+            <div class="relative z-20">
+                <h1 class="font-serif text-3xl sm:text-[36px] text-[#4E3B30] font-semibold leading-tight tracking-wide">
+                    Quốc Huy
+                </h1>
+                <span class="block font-serif italic text-lg text-[#B5926B] my-1">&amp;</span>
+                <h1 class="font-serif text-3xl sm:text-[36px] text-[#4E3B30] font-semibold leading-tight tracking-wide">
+                    Hồng Ngọc
+                </h1>
+            </div>
+
+            <!-- Tiny Gold Leaf Divider -->
+            <div class="relative z-20 flex items-center justify-center gap-3 my-4">
+                <span class="w-11 h-[1px] bg-[#C8B299]"></span>
+                <i class="fa-solid fa-seedling text-[10px] text-[#B89468]"></i>
+                <span class="w-11 h-[1px] bg-[#C8B299]"></span>
+            </div>
+
+            <!-- Wedding Date -->
+            <p class="relative z-20 font-serif text-[15px] text-[#5C4B41] tracking-wider mb-2.5">
+                29 tháng 11, 2026
+            </p>
+
+            <!-- Thân Mời -->
+            <p class="relative z-20 font-serif italic text-xs text-[#6E5A4F] mb-5">
+                Thân Mời
+            </p>
+
+            <!-- Mở Thiệp Pill Button -->
+            <button type="button"
+                class="relative z-20 inline-flex items-center justify-center px-9 py-2.5 rounded-full bg-[#5C4436] text-white text-xs font-medium tracking-wider shadow-md hover:bg-[#4A3529] hover:scale-105 transition-all cursor-pointer">
+                Mở thiệp
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== KHUNG NỘI DUNG CHÍNH (GIỐNG MẪU IMAGE 2 & 3) ==================== -->
+    <main
+        class="max-w-[440px] mx-auto bg-castle-paper shadow-2xl min-h-screen relative overflow-hidden border-x border-[#DED2C2]">
+
+        <!-- ==================== PHẦN 1: HEADER & POLAROID PHOTO ==================== -->
+        <header id="hero-header" class="hero-entrance relative z-10 pt-10 pb-8 px-6 text-center">
+            <p class="text-[9px] tracking-[0.35em] uppercase text-[#7A685B] font-semibold mb-2">THE WEDDING OF</p>
+
+            <!-- Script Couple Names in One Line -->
+            <h1 class="font-serif italic text-3xl sm:text-[34px] text-[#5C4B41] font-medium tracking-wide mb-7">
+                Quốc Huy <span class="font-script text-2xl text-[#9C8574] mx-1">&amp;</span> Hồng Ngọc
+            </h1>
+
+            <!-- TILTED POLAROID FRAME WITH WASHI TAPE, BABY'S BREATH & GOLD WAX SEAL -->
+            <div class="relative w-[240px] sm:w-[255px] mx-auto my-4 select-none">
+
+                <!-- Top Washi Tape (bang-dinh.png) -->
+                <img src="image2/bang-dinh.png" alt="Băng dính giấy"
+                    class="absolute -top-3.5 left-1/2 -translate-x-1/2 w-20 h-auto z-30 pointer-events-none drop-shadow-xs -rotate-2" />
+
+                <!-- Tilted Polaroid Card -->
+                <div
+                    class="relative bg-white p-2.5 pb-6 shadow-xl rounded-xs border border-[#EAE2D6] transform -rotate-3 transition-transform duration-500 hover:rotate-0 z-10 overflow-hidden">
+                    <!-- Red Dried Flower Accent in Top-Right Inside Photo Frame -->
+                    <img src="image2/hoa-do.png" alt="Hoa đỏ"
+                        class="absolute -top-2 -right-2 w-16 h-auto z-20 pointer-events-none opacity-90" />
+
+                    <div class="w-full h-[270px] overflow-hidden bg-stone-100">
+                        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=700&q=80"
+                            alt="Quốc Huy & Hồng Ngọc" class="w-full h-full object-cover">
+                    </div>
+                </div>
+
+                <!-- Left Baby's Breath Sprig Overlapping Bottom-Left of Polaroid -->
+                <img src="image2/hoa-nhi-trai.png" alt="Hoa nhí trái"
+                    class="boho-flower absolute -left-11 -bottom-10 w-28 h-auto z-30 -rotate-12 drop-shadow-md" />
+
+                <!-- Gold Wax Seal Overlapping Bottom-Right of Polaroid -->
+                <img src="image2/con-dau.png" alt="Con dấu sáp vàng"
+                    class="absolute -right-5 -bottom-4 w-14 h-14 object-contain z-30 drop-shadow-md" />
+            </div>
+        </header>
+
+        <!-- ==================== PHẦN 2: THẺ KEM 1 - THÔNG TIN LỄ CƯỚI ==================== -->
+        <section id="section-wedding-info" class="reveal-section relative z-10 px-6 my-6">
+            <div class="relative beige-card rounded-md px-5 py-9 text-center border border-cardborder/80">
+
+                <!-- Left Green/Gold Leaf Sprig Overlapping Left Edge -->
+                <img src="image2/canh-la.png" alt="Cành lá trái"
+                    class="boho-flower absolute -left-9 top-36 w-20 sm:w-24 h-auto z-20 -rotate-12 drop-shadow-sm" />
+
+                <!-- Right Baby's Breath Sprig Overlapping Bottom-Right Edge -->
+                <img src="image2/hoa-nhi-phai.png" alt="Hoa nhí phải"
+                    class="boho-flower-alt absolute -right-8 -bottom-6 w-24 sm:w-28 h-auto z-20 rotate-6 drop-shadow-sm" />
+
+                <!-- Title -->
+                <h2 class="reveal-item text-[11px] tracking-[0.25em] uppercase font-bold text-[#4E3D34] mb-5">
+                    THÔNG TIN LỄ CƯỚI
+                </h2>
+
+                <!-- Two Columns Family Info -->
+                <div class="reveal-item delay-100 grid grid-cols-2 gap-2 items-start py-3 mb-5 relative">
+                    <!-- Vertical Divider -->
+                    <div class="absolute left-1/2 top-2 bottom-2 w-[1px] bg-[#B8A998] -translate-x-1/2"></div>
+
+                    <div class="pr-2 text-center">
+                        <p class="text-[9px] uppercase tracking-widest text-[#7A685B] font-semibold mb-1">Nhà Trai</p>
+                        <p class="font-serif text-[13px] font-bold text-[#4E3D34] leading-snug">Bố: Nguyễn Văn Hoằng</p>
+                        <p class="font-serif text-[13px] font-bold text-[#4E3D34] leading-snug">Mẹ: Ngô Thị Thu</p>
+                        <p class="text-[9px] text-[#7A685B] mt-1 leading-tight">Cẩm Hoàng - Xuân Cẩm - Bắc Ninh</p>
+                    </div>
+                    <div class="pl-2 text-center">
+                        <p class="text-[9px] uppercase tracking-widest text-[#7A685B] font-semibold mb-1">Nhà Gái</p>
+                        <p class="font-serif text-[13px] font-bold text-[#4E3D34] leading-snug">Bố: Nguyễn Văn Sửu</p>
+                        <p class="font-serif text-[13px] font-bold text-[#4E3D34] leading-snug">Mẹ: Nguyễn Thị Định</p>
+                        <p class="text-[9px] text-[#7A685B] mt-1 leading-tight">Cẩm Bào - Xuân Cẩm - Bắc Ninh</p>
+                    </div>
+                </div>
+
+                <!-- Lead Announcement Text -->
+                <div class="reveal-item delay-100 mb-4">
+                    <p class="text-[9px] uppercase tracking-[0.2em] text-[#6E5A4F] font-semibold">TRÂN TRỌNG BÁO TIN</p>
+                    <p class="text-[9px] uppercase tracking-[0.16em] text-[#7A685B] mt-0.5">LỄ THÀNH HÔN CỦA CON CHÚNG
+                        TÔI</p>
+                </div>
+
+                <!-- Couple Full Names -->
+                <div class="reveal-item delay-200 my-5">
+                    <h3 class="font-serif text-3xl sm:text-[32px] font-semibold tracking-wide text-[#4E3D34]">
+                        Nguyễn Quốc Huy
+                    </h3>
+                    <p class="text-[8px] uppercase tracking-[0.25em] text-[#8C7A6B] mt-0.5">Chú Rể</p>
+
+                    <span class="font-serif italic text-xl text-[#7A685B] my-2 block">&amp;</span>
+
+                    <h3 class="font-serif text-3xl sm:text-[32px] font-semibold tracking-wide text-[#4E3D34]">
+                        Nguyễn Hồng Ngọc
+                    </h3>
+                    <p class="text-[8px] uppercase tracking-[0.25em] text-[#8C7A6B] mt-0.5">Cô Dâu</p>
+                </div>
+
+                <!-- BLOCK 1: LỄ THÀNH HÔN (NHÀ TRAI) -->
+                <div class="reveal-item delay-300 mt-6 pt-5 border-t border-[#D5C7B6]">
+                    <p class="text-[10px] uppercase tracking-[0.2em] font-bold text-[#4E3D34]">LỄ THÀNH HÔN ĐƯỢC CỬ HÀNH
+                        TẠI</p>
+                    <p class="font-serif font-semibold text-sm text-[#5C4B41] mt-1">Cẩm Hoàng - Xuân Cẩm - Bắc Ninh</p>
+                    <p class="text-[9px] uppercase tracking-[0.2em] text-[#7A685B] mt-2">VÀO LÚC</p>
+                    <p class="font-serif text-xl font-bold text-[#4E3D34] mt-0.5">10:00</p>
+
+                    <!-- Date Row: CHỦ NHẬT | 29 | THÁNG 11 -->
+                    <div class="flex items-center justify-center gap-4 my-2">
+                        <span
+                            class="text-[10px] uppercase tracking-[0.18em] text-[#6E5A4F] font-medium min-w-[72px] text-right">CHỦ
+                            NHẬT</span>
+                        <div class="h-6 w-[1px] bg-[#B8A998]"></div>
+                        <span class="font-serif text-3xl font-bold text-[#4E3D34] px-1">29</span>
+                        <div class="h-6 w-[1px] bg-[#B8A998]"></div>
+                        <span
+                            class="text-[10px] uppercase tracking-[0.18em] text-[#6E5A4F] font-medium min-w-[72px] text-left">THÁNG
+                            11</span>
+                    </div>
+
+                    <p class="font-serif text-sm font-bold tracking-widest text-[#4E3D34]">2026</p>
+                    <p class="font-serif italic text-[11px] text-[#7A685B] mt-1">
+                        (TỨC NGÀY 21 THÁNG 10 NĂM 2026)
+                    </p>
+                </div>
+
+                <!-- BLOCK 2: LỄ VU QUY (NHÀ GÁI) -->
+                <div class="reveal-item delay-400 mt-6 pt-5 border-t border-[#D5C7B6]">
+                    <p class="text-[10px] uppercase tracking-[0.2em] font-bold text-[#4E3D34]">LỄ VU QUY ĐƯỢC CỬ HÀNH
+                        TẠI</p>
+                    <p class="font-serif font-semibold text-sm text-[#5C4B41] mt-1">Cẩm Bào - Xuân Cẩm - Bắc Ninh</p>
+                    <p class="text-[9px] uppercase tracking-[0.2em] text-[#7A685B] mt-2">VÀO LÚC</p>
+                    <p class="font-serif text-xl font-bold text-[#4E3D34] mt-0.5">09:00</p>
+
+                    <!-- Date Row: CHỦ NHẬT | 29 | THÁNG 11 -->
+                    <div class="flex items-center justify-center gap-4 my-2">
+                        <span
+                            class="text-[10px] uppercase tracking-[0.18em] text-[#6E5A4F] font-medium min-w-[72px] text-right">CHỦ
+                            NHẬT</span>
+                        <div class="h-6 w-[1px] bg-[#B8A998]"></div>
+                        <span class="font-serif text-3xl font-bold text-[#4E3D34] px-1">29</span>
+                        <div class="h-6 w-[1px] bg-[#B8A998]"></div>
+                        <span
+                            class="text-[10px] uppercase tracking-[0.18em] text-[#6E5A4F] font-medium min-w-[72px] text-left">THÁNG
+                            11</span>
+                    </div>
+
+                    <p class="font-serif text-sm font-bold tracking-widest text-[#4E3D34]">2026</p>
+                    <p class="font-serif italic text-[11px] text-[#7A685B] mt-1">
+                        (TỨC NGÀY 21 THÁNG 10 NĂM 2026)
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==================== PHẦN 3: ALBUM ẢNH (3D COVERFLOW CAROUSEL GIỐNG MẪU) ==================== -->
+        <section class="reveal-section relative z-10 py-8 text-center overflow-hidden">
+            <h2 class="reveal-item font-serif text-sm tracking-[0.22em] uppercase font-bold text-[#6E5A4F] mb-6">
+                ALBUM ẢNH
+            </h2>
+
+            <!-- 3D Coverflow Stage with Translucent Side Arrows -->
+            <div class="reveal-item delay-100 relative flex items-center justify-center">
+                <button onclick="manualPrevSlide()" aria-label="Ảnh trước"
+                    class="absolute left-[14%] sm:left-[16%] z-40 w-7 h-7 rounded-full bg-[#E5DDD3]/75 backdrop-blur-2xs flex items-center justify-center text-[#5C4B41] hover:bg-[#6E5A4F] hover:text-white transition shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                </button>
+
+                <div id="carousel-stage"
+                    class="perspective-container relative h-[320px] w-full flex items-center justify-center select-none">
+                    <!-- Slides dynamically rendered by JS -->
+                </div>
+
+                <button onclick="manualNextSlide()" aria-label="Ảnh tiếp"
+                    class="absolute right-[14%] sm:right-[16%] z-40 w-7 h-7 rounded-full bg-[#E5DDD3]/75 backdrop-blur-2xs flex items-center justify-center text-[#5C4B41] hover:bg-[#6E5A4F] hover:text-white transition shadow-xs cursor-pointer">
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </button>
+            </div>
+
+            <!-- Slide Counter Below Album -->
+            <div class="mt-4 flex items-center justify-center">
+                <span id="slide-counter" class="text-xs font-sans tracking-[0.2em] text-[#8C7A6B]">1 / 8</span>
+            </div>
+        </section>
+
+        <!-- ==================== PHẦN 4: THẺ KEM 2 - THÔNG TIN TIỆC CƯỚI & LỊCH THÁNG 11/2026 ==================== -->
+        <section class="reveal-section relative z-10 px-6 my-4">
+            <div class="relative beige-card rounded-md px-5 py-9 text-center border border-cardborder/80">
+
+                <!-- Right Green/Gold Leaf Sprig Overlapping Top-Right Edge -->
+                <img src="image2/canh-la.png" alt="Cành lá phải"
+                    class="boho-flower-alt absolute -right-9 top-16 w-20 sm:w-24 h-auto z-20 rotate-12 drop-shadow-sm" />
+
+                <!-- Left Baby's Breath Sprig Overlapping Bottom-Left Edge -->
+                <img src="image2/hoa-nhi-trai.png" alt="Hoa nhí trái"
+                    class="boho-flower absolute -left-8 -bottom-6 w-24 sm:w-28 h-auto z-20 -rotate-6 drop-shadow-sm" />
+
+                <!-- Title & Subtitle -->
+                <h2 class="reveal-item text-[11px] tracking-[0.25em] uppercase font-bold text-[#4E3D34] mb-1.5">
+                    THÔNG TIN TIỆC CƯỚI
+                </h2>
+                <p class="reveal-item delay-100 text-[10px] tracking-[0.16em] uppercase text-[#7A685B] mb-3">
+                    TIỆC CƯỚI SẼ DIỄN RA VÀO LÚC:
+                </p>
+
+                <!-- Banquet Hour -->
+                <p class="font-serif text-2xl font-bold text-[#4E3D34] mb-2">16:00</p>
+
+                <!-- Date Row: THỨ BẢY | 28 | THÁNG 11 -->
+                <div class="flex items-center justify-center gap-4 my-2">
+                    <span
+                        class="text-[10px] uppercase tracking-[0.18em] text-[#6E5A4F] font-medium min-w-[68px] text-right">THỨ
+                        BẢY</span>
+                    <div class="h-6 w-[1px] bg-[#B8A998]"></div>
+                    <span class="font-serif text-3xl font-bold text-[#4E3D34] px-1">28</span>
+                    <div class="h-6 w-[1px] bg-[#B8A998]"></div>
+                    <span
+                        class="text-[10px] uppercase tracking-[0.18em] text-[#6E5A4F] font-medium min-w-[68px] text-left">THÁNG
+                        11</span>
+                </div>
+
+                <p class="font-serif text-sm font-bold tracking-widest text-[#4E3D34]">2026</p>
+
+                <!-- Two Banquet Details (Nhà Trai & Nhà Gái) -->
+                <div class="grid grid-cols-1 gap-2.5 my-4 pt-3 border-t border-[#D5C7B6] text-center">
+                    <div class="bg-[#FAF6F0]/70 rounded-sm p-2.5 border border-[#DED0BD]">
+                        <p class="text-[9px] uppercase tracking-[0.18em] font-bold text-[#6E5A4F]">TIỆC CƯỚI NHÀ TRAI
+                            (16:00 - 28/11/2026)</p>
+                        <p class="font-serif text-xs font-semibold text-[#4E3D34] mt-0.5">Tại: Cẩm Hoàng - Xuân Cẩm -
+                            Bắc Ninh</p>
+                        <p class="font-serif italic text-[10px] text-[#7A685B]">(Tức ngày 20 tháng 10 năm 2026)</p>
+                    </div>
+                    <div class="bg-[#FAF6F0]/70 rounded-sm p-2.5 border border-[#DED0BD]">
+                        <p class="text-[9px] uppercase tracking-[0.18em] font-bold text-[#6E5A4F]">TIỆC CƯỚI NHÀ GÁI
+                            (16:00 - 28/11/2026)</p>
+                        <p class="font-serif text-xs font-semibold text-[#4E3D34] mt-0.5">Tại: Cẩm Bào - Xuân Cẩm - Bắc
+                            Ninh</p>
+                        <p class="font-serif italic text-[10px] text-[#7A685B]">(Tức ngày 21 tháng 10 năm 2026)</p>
+                    </div>
+                </div>
+
+                <!-- Reception & Banquet Mini Row -->
+                <div class="flex justify-center items-center gap-8 my-4">
+                    <div>
+                        <span class="block text-[8px] uppercase tracking-widest text-[#7A685B]">ĐÓN KHÁCH</span>
+                        <span class="font-serif text-sm font-bold text-[#4E3D34] mt-0.5 block">15:30</span>
+                    </div>
+                    <div class="h-5 w-[1px] bg-[#C8B9A6]"></div>
+                    <div>
+                        <span class="block text-[8px] uppercase tracking-widest text-[#7A685B]">KHAI TIỆC</span>
+                        <span class="font-serif text-sm font-bold text-[#4E3D34] mt-0.5 block">16:00</span>
+                    </div>
+                </div>
+
+                <!-- DARK BROWN CALENDAR CARD INSIDE BEIGE CARD (GIỐNG MẪU IMAGE 2) -->
+                <div
+                    class="reveal-item delay-200 bg-[#6E5A4F] text-[#FAF6F0] rounded-md p-4 mt-5 mb-5 shadow-md mx-auto max-w-[295px]">
+                    <p class="font-script text-xl text-[#FAF6F0] mb-2">Tháng 11 / 2026</p>
+
+                    <!-- Weekday Headers -->
+                    <div
+                        class="grid grid-cols-7 text-[9px] font-medium uppercase tracking-wider border-y border-[#FAF6F0]/25 py-1.5 mb-2 text-[#FAF6F0]/80">
+                        <div>T2</div>
+                        <div>T3</div>
+                        <div>T4</div>
+                        <div>T5</div>
+                        <div>T6</div>
+                        <div>T7</div>
+                        <div>CN</div>
+                    </div>
+
+                    <!-- Days Grid (Nov 1, 2026 is Sunday) -->
+                    <div class="grid grid-cols-7 gap-y-2 text-[10px] font-normal text-[#FAF6F0]/90 items-center">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div>1</div>
+                        <div>2</div>
+                        <div>3</div>
+                        <div>4</div>
+                        <div>5</div>
+                        <div>6</div>
+                        <div>7</div>
+                        <div>8</div>
+                        <div>9</div>
+                        <div>10</div>
+                        <div>11</div>
+                        <div>12</div>
+                        <div>13</div>
+                        <div>14</div>
+                        <div>15</div>
+                        <div>16</div>
+                        <div>17</div>
+                        <div>18</div>
+                        <div>19</div>
+                        <div>20</div>
+                        <div>21</div>
+                        <div>22</div>
+                        <div>23</div>
+                        <div>24</div>
+                        <div>25</div>
+                        <div>26</div>
+                        <div>27</div>
+                        <!-- Highlighted 28th (Tiệc cưới) with White Heart -->
+                        <div class="relative flex items-center justify-center">
+                            <i class="fa-solid fa-heart text-white/90 text-xl"></i>
+                            <span class="absolute text-[9px] font-bold text-[#6E5A4F]">28</span>
+                        </div>
+                        <!-- Highlighted 29th (Lễ Thành Hôn & Vu Quy) with White Heart -->
+                        <div class="relative flex items-center justify-center">
+                            <i class="fa-solid fa-heart text-white text-xl"></i>
+                            <span class="absolute text-[9px] font-bold text-[#6E5A4F]">29</span>
+                        </div>
+                        <div>30</div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+
+                <!-- Live Countdown -->
+                <div class="my-3">
+                    <p class="text-[9px] uppercase tracking-[0.2em] text-[#7A685B] mb-1">CÙNG ĐẾM NGƯỢC:</p>
+                    <p id="countdown-inline" class="font-serif italic text-base text-[#4E3D34] font-semibold">
+                        24 ngày 18 giờ 00 phút 00 giây
+                    </p>
+                </div>
+
+                <!-- Add to Calendar Link -->
+                <div class="mt-3">
+                    <button onclick="addToCalendar()"
+                        class="inline-block text-[11px] tracking-wider underline underline-offset-4 text-[#5C4B41] hover:text-[#4E3D34] transition cursor-pointer">
+                        Thêm vào lịch
+                    </button>
+                </div>
+
+                <!-- XÁC NHẬN THAM DỰ Pill Button -->
+                <div class="mt-4">
+                    <a href="#guestbook-section"
+                        class="inline-block px-7 py-2 rounded-full bg-[#6E5A4F] text-white text-[10px] uppercase tracking-[0.2em] font-semibold shadow hover:bg-[#5A473D] transition">
+                        XÁC NHẬN THAM DỰ
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PHẦN 5: ĐỊA ĐIỂM TỔ CHỨC & BẢN ĐỒ (GIỐNG MẪU IMAGE 3) ==================== -->
+        <section class="reveal-section relative z-10 px-6 py-6 text-center">
+            <h2 class="text-[11px] tracking-[0.22em] uppercase font-bold text-[#4E3D34] mb-1">
+                TIỆC CƯỚI SẼ TỔ CHỨC TẠI
+            </h2>
+            <p class="text-[11px] text-[#6E5A4F] leading-relaxed mb-1">
+                <strong>Nhà Trai:</strong> Cẩm Hoàng - Xuân Cẩm - Bắc Ninh
+            </p>
+            <p class="text-[11px] text-[#6E5A4F] leading-relaxed mb-4">
+                <strong>Nhà Gái:</strong> Cẩm Bào - Xuân Cẩm - Bắc Ninh
+            </p>
+
+            <!-- Embedded Google Map of Xuân Cẩm, Bắc Ninh -->
+            <div class="rounded-md overflow-hidden shadow-md border border-[#DED0BD] bg-white p-1">
+                <iframe src="https://www.google.com/maps?q=Xuân+Cẩm,+Hiệp+Hòa,+Bắc+Ninh&output=embed" width="100%"
+                    height="210" style="border:0;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade" title="Bản đồ Xuân Cẩm - Bắc Ninh">
+                </iframe>
+            </div>
+
+            <div class="mt-3">
+                <a href="https://www.google.com/maps/search/?api=1&query=Xuân+Cẩm+Bắc+Ninh" target="_blank"
+                    class="inline-flex items-center gap-1.5 text-xs font-serif italic text-[#5C4B41] hover:text-[#4E3D34] underline underline-offset-4">
+                    <i class="fa-solid fa-location-arrow text-[10px]"></i> Chỉ đường trên Google Maps
+                </a>
+            </div>
+        </section>
+
+        <!-- ==================== PHẦN 6: DRESS CODE & LỊCH TRÌNH NGÀY CƯỚI (GIỐNG MẪU IMAGE 3) ==================== -->
+        <section class="reveal-section relative z-10 px-6 py-4 text-center">
+            <!-- Dress Code -->
+            <div class="mb-7">
+                <h2 class="text-[11px] tracking-[0.25em] uppercase font-bold text-[#4E3D34] mb-1">
+                    DRESS CODE
+                </h2>
+                <p class="font-serif italic text-xs text-[#7A685B] mb-3">Trang phục dự tiệc</p>
+                <div class="flex items-center justify-center gap-3.5">
+                    <span class="w-7 h-7 rounded-full bg-[#1C2826] border border-white shadow-sm"
+                        title="Đen / Xanh than"></span>
+                    <span class="w-7 h-7 rounded-full bg-[#D8A45B] border border-white shadow-sm"
+                        title="Vàng đồng"></span>
+                    <span class="w-7 h-7 rounded-full bg-[#3A5A40] border border-white shadow-sm"
+                        title="Xanh rêu"></span>
+                    <span class="w-7 h-7 rounded-full bg-[#F3E5AB] border border-stone-300 shadow-sm"
+                        title="Kem / Be sáng"></span>
+                </div>
+            </div>
+
+            <!-- Timeline Card (LỊCH TRÌNH NGÀY CƯỚI) -->
+            <div class="relative beige-card rounded-md px-5 py-8 border border-cardborder/80">
+                <!-- Right Baby's Breath Sprig on Top-Right Edge -->
+                <img src="image2/hoa-nhi-phai.png" alt="Hoa nhí phải"
+                    class="boho-flower-alt absolute -right-7 -top-6 w-24 h-auto z-20 rotate-6 drop-shadow-sm" />
+
+                <h3 class="text-[11px] tracking-[0.22em] uppercase font-bold text-[#4E3D34] mb-6">
+                    LỊCH TRÌNH NGÀY CƯỚI
+                </h3>
+
+                <!-- Vertical Timeline -->
+                <div class="relative max-w-[270px] mx-auto text-left">
+                    <!-- Center Vertical Line -->
+                    <div class="absolute left-[44%] top-2 bottom-2 w-[1px] bg-[#6E5A4F]/50"></div>
+
+                    <!-- Item 1 -->
+                    <div class="relative flex items-center mb-5">
+                        <div class="w-[44%] pr-4 text-right">
+                            <span class="font-serif text-xs font-bold text-[#4E3D34]">16:00</span>
+                            <span class="block text-[9px] text-[#7A685B]">28/11/2026</span>
+                        </div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#6E5A4F] border-2 border-[#EDE2D3] z-10 -ml-[5px]">
+                        </div>
+                        <div class="w-[56%] pl-4">
+                            <span class="font-serif text-xs font-semibold text-[#4E3D34]">Tiệc Cưới Hai Gia Đình</span>
+                        </div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="relative flex items-center mb-5">
+                        <div class="w-[44%] pr-4 text-right">
+                            <span class="font-serif text-xs font-bold text-[#4E3D34]">09:00</span>
+                            <span class="block text-[9px] text-[#7A685B]">29/11/2026</span>
+                        </div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#6E5A4F] border-2 border-[#EDE2D3] z-10 -ml-[5px]">
+                        </div>
+                        <div class="w-[56%] pl-4">
+                            <span class="font-serif text-xs font-semibold text-[#4E3D34]">Lễ Vu Quy (Nhà Gái)</span>
+                        </div>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div class="relative flex items-center">
+                        <div class="w-[44%] pr-4 text-right">
+                            <span class="font-serif text-xs font-bold text-[#4E3D34]">10:00</span>
+                            <span class="block text-[9px] text-[#7A685B]">29/11/2026</span>
+                        </div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#6E5A4F] border-2 border-[#EDE2D3] z-10 -ml-[5px]">
+                        </div>
+                        <div class="w-[56%] pl-4">
+                            <span class="font-serif text-xs font-semibold text-[#4E3D34]">Lễ Thành Hôn (Nhà Trai)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PHẦN 7: SỔ LƯU BÚT (GUESTBOOK - LƯU EXCEL ONLINE & HIỂN THỊ 5 NGƯỜI GẦN NHẤT) ==================== -->
+        <section id="guestbook-section" class="reveal-section relative z-10 px-6 py-6">
+            <div class="relative bg-[#FAF7F2] rounded-md p-6 shadow-md border border-[#E5DACB]">
+
+                <!-- Left Leaf Sprig on Bottom-Left of Guestbook -->
+                <img src="image2/canh-la.png" alt="Cành lá"
+                    class="boho-flower absolute -left-7 -bottom-5 w-16 h-auto z-20 -rotate-12 opacity-90" />
+
+                <h2 class="text-center text-[11px] tracking-[0.25em] uppercase font-bold text-[#4E3D34] mb-4">
+                    SỔ LƯU BÚT
+                </h2>
+
+                <form onsubmit="submitWish(event)" class="space-y-3">
+                    <input type="text" id="wish-name" required placeholder="Tên của bạn*"
+                        class="w-full px-3 py-2 rounded-xs bg-white border border-[#9C8978] text-xs text-[#4E3D34] placeholder-[#9C8978] focus:outline-none focus:border-[#4E3D34]">
+                    <textarea id="wish-content" rows="3" required placeholder="Nhập lời chúc*"
+                        class="w-full px-3 py-2 rounded-xs bg-white border border-[#9C8978] text-xs text-[#4E3D34] placeholder-[#9C8978] focus:outline-none focus:border-[#4E3D34]"></textarea>
+                    <div class="flex justify-end pt-0.5">
+                        <button type="submit" id="wish-submit-btn"
+                            class="px-6 py-1.5 rounded-full bg-[#6E5A4F] text-white font-medium text-[10px] uppercase tracking-widest hover:bg-[#5A473D] transition cursor-pointer shadow-xs">
+                            GỬI LỜI CHÚC
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Toast Notification Box -->
+                <div id="toast-box"
+                    class="hidden mt-3 p-2.5 rounded-xs bg-[#EDE2D3] text-[#4E3D34] text-xs font-medium text-center">
+                </div>
+            </div>
+
+            <!-- Wishes Feed List (5 Most Recent) -->
+            <div id="wishes-list" class="mt-4 space-y-2.5"></div>
+        </section>
+
+        <!-- ==================== PHẦN 8: HỘP QUÀ MỪNG (DÙNG ẢNH image2/hopmungqua.png) ==================== -->
+        <section class="reveal-section relative z-10 px-6 pt-4 pb-12 text-center">
+            <h2 class="text-[11px] tracking-[0.25em] uppercase font-bold text-[#4E3D34] mb-3">
+                HỘP QUÀ MỪNG
+            </h2>
+
+            <div onclick="toggleModal('gift-modal')" class="inline-flex flex-col items-center cursor-pointer group">
+                <div
+                    class="relative w-44 h-38 flex items-center justify-center transition-transform duration-500 group-hover:scale-105">
+                    <img src="image2/hop-qua-tach-nen.png" alt="Hộp Quà Mừng"
+                        class="w-full h-full object-contain drop-shadow-[0_10px_18px_rgba(78,61,52,0.15)] animate-[pulse_3.5s_ease-in-out_infinite]" />
+                </div>
+                <span
+                    class="mt-1 text-[10px] uppercase tracking-widest text-[#6E5A4F] underline underline-offset-4 group-hover:text-[#4E3D34] transition-colors">
+                    Chạm vào hộp quà để gửi mừng cưới
+                </span>
+            </div>
+
+            <!-- Footer -->
+            <footer class="mt-10 pt-4 border-t border-[#DED0BD]/60 text-center text-[#7A685B]">
+                <p class="font-script text-3xl text-[#4E3D34] mb-1">Quốc Huy &amp; Hồng Ngọc</p>
+                <p class="text-[9px] uppercase tracking-[0.22em]">28 - 29 . 11 . 2026 • Bắc Ninh</p>
+            </footer>
+        </section>
+
+        <!-- MODAL HỘP MỪNG CƯỚI (QR CODE) -->
+        <div id="gift-modal"
+            class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div
+                class="bg-[#FAF7F2] text-[#4E3D34] max-w-md w-full rounded-xl p-5 sm:p-6 shadow-2xl border border-[#DED0BD] relative text-center">
+                <button onclick="toggleModal('gift-modal')"
+                    class="absolute top-3 right-4 text-[#6E5A4F] hover:text-[#4E3D34] text-lg cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <h3 class="font-serif text-2xl font-bold text-[#4E3D34] mb-1">Hộp Quà Mừng Cưới</h3>
+                <p class="text-xs text-[#7A685B] mb-5">Cảm ơn tình cảm quý báu của quý khách dành cho vợ chồng chúng
+                    mình!</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- QR Chú Rể -->
+                    <div class="bg-white p-3.5 rounded-xl border border-[#DED0BD] shadow-xs flex flex-col items-center">
+                        <p class="text-[11px] font-bold uppercase tracking-wider text-[#4E3D34] mb-2">Chú Rể: Quốc Huy
+                        </p>
+                        <div
+                            class="w-full max-w-[175px] rounded-lg overflow-hidden border border-[#EDE2D3] bg-white flex items-center justify-center p-1 mb-2">
+                            <img src="image2/qr-chu-re.png" alt="QR Chú Rể Nguyễn Quốc Huy"
+                                class="w-full h-auto object-contain">
+                        </div>
+                        <p class="text-[11px] font-bold text-[#4E3D34] uppercase">NGUYEN QUOC HUY</p>
+                        <p class="text-xs font-bold text-[#6E5A4F] tracking-wide my-0.5">0969762425</p>
+                        <p class="text-[10px] text-[#7A685B] mb-2">Ngân hàng MB Bank</p>
+                        <button type="button" onclick="copyBankNumber('0969762425', 'Nguyễn Quốc Huy')"
+                            class="px-3 py-1 rounded-full bg-[#EDE2D3] hover:bg-[#6E5A4F] hover:text-white text-[#4E3D34] text-[10px] font-medium transition cursor-pointer flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i> Sao chép STK
+                        </button>
+                    </div>
+
+                    <!-- QR Cô Dâu -->
+                    <div class="bg-white p-3.5 rounded-xl border border-[#DED0BD] shadow-xs flex flex-col items-center">
+                        <p class="text-[11px] font-bold uppercase tracking-wider text-[#4E3D34] mb-2">Cô Dâu: Hồng Ngọc
+                        </p>
+                        <div
+                            class="w-full max-w-[175px] rounded-lg overflow-hidden border border-[#EDE2D3] bg-white flex items-center justify-center p-1 mb-2">
+                            <img src="image2/qr-co-dau.png" alt="QR Cô Dâu Nguyễn Hồng Ngọc"
+                                class="w-full h-auto object-contain">
+                        </div>
+                        <p class="text-[11px] font-bold text-[#4E3D34] uppercase">NGUYEN HONG NGOC</p>
+                        <p class="text-xs font-bold text-[#6E5A4F] tracking-wide my-0.5">1029609658</p>
+                        <p class="text-[10px] text-[#7A685B] mb-2">Vietcombank - PGD Hiệp Hòa</p>
+                        <button type="button" onclick="copyBankNumber('1029609658', 'Nguyễn Hồng Ngọc')"
+                            class="px-3 py-1 rounded-full bg-[#EDE2D3] hover:bg-[#6E5A4F] hover:text-white text-[#4E3D34] text-[10px] font-medium transition cursor-pointer flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i> Sao chép STK
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* ---------------- 1. AUTO-ADVANCING 3D COVERFLOW CAROUSEL ---------------- */
+        const photos = [
+            "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=700&q=80",
+            "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=700&q=80",
+            "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=700&q=80",
+            "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=700&q=80",
+            "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=700&q=80",
+            "https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=700&q=80",
+            "https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=700&q=80",
+            "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=700&q=80"
+        ];
+        let currentIndex = 0;
+        const stage = document.getElementById('carousel-stage');
+        const counter = document.getElementById('slide-counter');
+        let slideElements = [];
+        let autoSlideTimer = null;
+
+        // Create slide DOM elements once so CSS 3D transitions interpolate smoothly
+        function initCarousel() {
+            stage.innerHTML = '';
+            slideElements = photos.map((src, idx) => {
+                const card = document.createElement('div');
+                card.className = "coverflow-item absolute w-[190px] sm:w-[205px] h-[275px] sm:h-[295px] rounded-xl overflow-hidden cursor-pointer bg-[#EDE2D3] select-none";
+                card.innerHTML = `
+                    <img src="${src}" alt="Ảnh cưới ${idx + 1}" class="w-full h-full object-cover pointer-events-none">
+                    <div class="coverflow-glare absolute inset-0 pointer-events-none opacity-0"></div>
+                `;
+                card.onclick = () => {
+                    if (currentIndex !== idx) {
+                        currentIndex = idx;
+                        updateCarousel();
+                        resetAutoSlide();
+                    }
+                };
+                stage.appendChild(card);
+                return card;
+            });
+            updateCarousel();
+            resetAutoSlide();
+        }
+
+        function updateCarousel() {
+            const total = photos.length;
+            slideElements.forEach((card, idx) => {
+                let offset = idx - currentIndex;
+                if (offset > total / 2) offset -= total;
+                if (offset < -total / 2) offset += total;
+
+                const absOffset = Math.abs(offset);
+                const sign = Math.sign(offset);
+                const glare = card.querySelector('.coverflow-glare');
+
+                let translateX = 0;
+                let translateZ = 0;
+                let rotateY = 0;
+                let scale = 1;
+                let opacity = 1;
+                let zIndex = 30;
+                let filter = "brightness(1) blur(0px)";
+                let boxShadow = "0 20px 42px -8px rgba(62, 46, 38, 0.32)";
+
+                if (offset === 0) {
+                    translateX = 0;
+                    translateZ = 40;
+                    rotateY = 0;
+                    scale = 1;
+                    opacity = 1;
+                    zIndex = 30;
+                    card.classList.add('is-active-slide');
+                    if (glare) glare.style.opacity = '0';
+                } else {
+                    card.classList.remove('is-active-slide');
+                    if (glare) glare.style.opacity = '1';
+
+                    if (absOffset === 1) {
+                        translateX = sign * 112;
+                        translateZ = -35;
+                        rotateY = -sign * 42;
+                        scale = 0.88;
+                        opacity = 0.94;
+                        zIndex = 25;
+                        filter = "brightness(0.95) blur(0px)";
+                        boxShadow = "0 14px 28px -6px rgba(62, 46, 38, 0.22)";
+                    } else if (absOffset === 2) {
+                        translateX = sign * 172;
+                        translateZ = -95;
+                        rotateY = -sign * 56;
+                        scale = 0.76;
+                        opacity = 0.72;
+                        zIndex = 20;
+                        filter = "brightness(0.9) blur(0.3px)";
+                        boxShadow = "0 8px 18px -4px rgba(62, 46, 38, 0.15)";
+                    } else if (absOffset === 3) {
+                        translateX = sign * 218;
+                        translateZ = -150;
+                        rotateY = -sign * 64;
+                        scale = 0.65;
+                        opacity = 0.42;
+                        zIndex = 15;
+                        filter = "brightness(0.85) blur(0.6px)";
+                        boxShadow = "none";
+                    } else {
+                        translateX = sign * 245;
+                        translateZ = -210;
+                        rotateY = -sign * 70;
+                        scale = 0.55;
+                        opacity = 0;
+                        zIndex = 5;
+                        filter = "brightness(0.8) blur(1px)";
+                        boxShadow = "none";
+                    }
+                }
+
+                card.style.transform = `translate3d(${translateX}px, 0, ${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
+                card.style.zIndex = zIndex;
+                card.style.opacity = opacity;
+                card.style.filter = filter;
+                card.style.boxShadow = boxShadow;
+                card.style.pointerEvents = absOffset > 2 ? 'none' : 'auto';
+            });
+
+            if (counter) {
+                counter.innerText = `${currentIndex + 1} / ${total}`;
+            }
+        }
+
+        function resetAutoSlide() {
+            if (autoSlideTimer) clearInterval(autoSlideTimer);
+            autoSlideTimer = setInterval(() => {
+                currentIndex = (currentIndex + 1) % photos.length;
+                updateCarousel();
+            }, 3800);
+        }
+
+        function manualNextSlide() {
+            currentIndex = (currentIndex + 1) % photos.length;
+            updateCarousel();
+            resetAutoSlide();
+        }
+
+        function manualPrevSlide() {
+            currentIndex = (currentIndex - 1 + photos.length) % photos.length;
+            updateCarousel();
+            resetAutoSlide();
+        }
+
+        // Touch swipe & mouse drag support for smooth mobile/desktop interaction
+        let dragStartX = 0;
+        let isDragging = false;
+
+        stage.addEventListener('touchstart', (e) => {
+            dragStartX = e.touches[0].clientX;
+            if (autoSlideTimer) clearInterval(autoSlideTimer);
+        }, { passive: true });
+
+        stage.addEventListener('touchend', (e) => {
+            const diffX = e.changedTouches[0].clientX - dragStartX;
+            if (Math.abs(diffX) > 35) {
+                if (diffX < 0) manualNextSlide();
+                else manualPrevSlide();
+            } else {
+                resetAutoSlide();
+            }
+        }, { passive: true });
+
+        stage.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            dragStartX = e.clientX;
+            if (autoSlideTimer) clearInterval(autoSlideTimer);
+        });
+
+        window.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            const diffX = e.clientX - dragStartX;
+            if (Math.abs(diffX) > 40) {
+                if (diffX < 0) manualNextSlide();
+                else manualPrevSlide();
+            } else {
+                resetAutoSlide();
+            }
+        });
+
+        initCarousel();
+
+        /* ---------------- 2. REAL-TIME COUNTDOWN TO NOV 29, 2026 10:00 ---------------- */
+        const targetWeddingTime = new Date("November 29, 2026 10:00:00").getTime();
+        const countdownEl = document.getElementById('countdown-inline');
+
+        function updateWeddingCountdown() {
+            const now = new Date().getTime();
+            const diff = targetWeddingTime - now;
+
+            if (diff <= 0) {
+                countdownEl.innerText = "Hôn lễ đang diễn ra trong niềm hạnh phúc!";
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            countdownEl.innerText = `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
+        }
+
+        setInterval(updateWeddingCountdown, 1000);
+        updateWeddingCountdown();
+
+        /* ---------------- 3. SỔ LƯU BÚT (ĐỌC TỪ GOOGLE SHEET & GHI QUA APPS SCRIPT WEB APP) ---------------- */
+        /**
+         * TẠI SAO DÁN LINK DOCS.GOOGLE.COM THÌ ĐỌC ĐƯỢC NHƯNG CHƯA TỰ GHI VÀO FILE?
+         * - Link `docs.google.com/spreadsheets/d/1ZT4LMdo18QoWVrwP-hQnDRPTrfp5oepGPY6gL3kubtY/edit...` là giao diện bảng tính,
+         *   Google chặn không cho trang web bên ngoài tự ý ghi (POST) thẳng vào link `/edit` nếu không có cầu nối Apps Script.
+         *
+         * CÁCH BẬT GHI TỰ ĐỘNG VÀO FILE GOOGLE SHEET NÀY (CHỈ MẤT 30 GIÂY):
+         * Bước 1: Mở file https://docs.google.com/spreadsheets/d/1ZT4LMdo18QoWVrwP-hQnDRPTrfp5oepGPY6gL3kubtY/edit
+         * Bước 2: Trên thanh menu, chọn: Tiện ích mở rộng (Extensions) -> Apps Script
+         * Bước 3: Xóa hết chữ trong khung code, dán đoạn mã 12 dòng này vào và bấm Ctrl+S (Lưu):
+         *
+         *   function doPost(e) {
+         *     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+         *     var p = e.parameter || {};
+         *     if (!p.name && e.postData && e.postData.contents) {
+         *       try { p = JSON.parse(e.postData.contents); } catch (err) {}
+         *     }
+         *     sheet.appendRow([p.time || new Date().toLocaleString("vi-VN"), p.name || "", p.content || ""]);
+         *     return ContentService.createTextOutput(JSON.stringify({ status: "ok" })).setMimeType(ContentService.MimeType.JSON);
+         *   }
+         *
+         * Bước 4: Bấm nút "Triển khai" (Deploy - nút màu xanh góc trên phải) -> "Tùy chọn triển khai mới" (New deployment)
+         *         - Chọn loại (biểu tượng bánh răng): "Ứng dụng web" (Web app)
+         *         - Quyền truy cập (Who has access): Chọn "Bất kỳ ai" (Anyone) -> Bấm "Triển khai" (Deploy) -> Cấp quyền (Authorize access)
+         * Bước 5: Copy đường link "URL ứng dụng web" (có dạng https://script.google.com/macros/s/AKfycb.../exec)
+         *         rồi dán vào biến APPS_SCRIPT_WEBAPP_URL ngay dòng bên dưới:
+         */
+        const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1ZT4LMdo18QoWVrwP-hQnDRPTrfp5oepGPY6gL3kubtY/edit?hl=vi&gid=0#gid=0";
+        const APPS_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzgTH2pYMvQ_lHWI8y6I2UKhG03USP_3u8q--O75bVYUUVKdjruui9oA0W4zf4A2HpFGQ/exec"; // <-- DÁN LINK https://script.google.com/macros/s/.../exec VÀO ĐÂY ĐỂ GHI VÀO FILE!
+        const WISHES_STORAGE_KEY = "wedding_wishes_quochuy_hongngoc_v1";
+        const MAX_DISPLAY_WISHES = 5;
+
+        const defaultWishes = [];
+
+        function extractSheetIdAndGid(url) {
+            if (!url) return null;
+            const idMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+            const gidMatch = url.match(/[?&#]gid=([0-9]+)/);
+            if (!idMatch) return null;
+            return {
+                sheetId: idMatch[1],
+                gid: gidMatch ? gidMatch[1] : "0"
+            };
+        }
+
+        function getStoredWishes() {
+            try {
+                const raw = localStorage.getItem(WISHES_STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch (err) { }
+            return [...defaultWishes];
+        }
+
+        function saveStoredWishes(wishesArray) {
+            try {
+                localStorage.setItem(WISHES_STORAGE_KEY, JSON.stringify(wishesArray));
+            } catch (err) { }
+        }
+
+        function formatNowTimestamp() {
+            const now = new Date();
+            const dd = String(now.getDate()).padStart(2, '0');
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const yyyy = now.getFullYear();
+            const hh = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            return `${dd}/${mm}/${yyyy} - ${hh}:${min}`;
+        }
+
+        // Chỉ hiển thị đúng 5 người gần nhất lên màn hình
+        function renderRecentWishes() {
+            const list = document.getElementById('wishes-list');
+            if (!list) return;
+            const allWishes = getStoredWishes();
+            const recentFive = allWishes.slice(0, MAX_DISPLAY_WISHES);
+
+            list.innerHTML = '';
+            recentFive.forEach((w) => {
+                const item = document.createElement('div');
+                item.className = "bg-[#FAF7F2] p-3.5 rounded-xs border border-[#DED0BD] shadow-2xs transition-all duration-300";
+                item.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="wish-author text-xs font-bold text-[#4E3D34]"></span>
+                        <span class="wish-time text-[9px] text-[#9C8978]"></span>
+                    </div>
+                    <p class="wish-message text-[11px] text-[#5C4B41] leading-relaxed"></p>
+                `;
+                item.querySelector('.wish-author').textContent = w.name;
+                item.querySelector('.wish-time').textContent = w.time || "Vừa xong";
+                item.querySelector('.wish-message').textContent = w.content;
+                list.appendChild(item);
+            });
+        }
+
+        // Chuyển đổi dữ liệu hàng từ Google Sheet thành danh sách { time, name, content }
+        function parseRowsToWishes(rows) {
+            const parsed = [];
+            rows.forEach((r) => {
+                const c0 = r[0] != null ? String(r[0]).trim() : "";
+                const c1 = r[1] != null ? String(r[1]).trim() : "";
+                const c2 = r[2] != null ? String(r[2]).trim() : "";
+                if (!c0 && !c1 && !c2) return;
+
+                // Bỏ qua dòng tiêu đề (Header) nếu có
+                const lower0 = c0.toLowerCase();
+                const lower1 = c1.toLowerCase();
+                if (
+                    lower0.includes("thời gian") || lower0.includes("time") || lower0.includes("stt") ||
+                    lower0.includes("tên") || lower1.includes("tên") || lower1.includes("lời chúc")
+                ) {
+                    return;
+                }
+
+                // Hỗ trợ cả cấu trúc 3 cột (Thời gian | Tên | Lời chúc) hoặc 2 cột (Tên | Lời chúc)
+                if (c2) {
+                    parsed.push({ time: c0, name: c1, content: c2 });
+                } else if (c0 && c1) {
+                    parsed.push({ time: "", name: c0, content: c1 });
+                }
+            });
+            return parsed;
+        }
+
+        // Đọc 5 lịch sử lưu bút gần nhất trực tiếp từ file docs.google.com/spreadsheets (qua JSONP không bị chặn CORS)
+        function loadRecentWishesFromGoogleDoc() {
+            // 1. Nếu có cấu hình Apps Script Web App URL thì ưu tiên gọi
+            if (APPS_SCRIPT_WEBAPP_URL && APPS_SCRIPT_WEBAPP_URL.includes("script.google.com")) {
+                fetch(APPS_SCRIPT_WEBAPP_URL)
+                    .then(r => r.json())
+                    .then(remoteList => {
+                        if (Array.isArray(remoteList) && remoteList.length > 0) {
+                            saveStoredWishes(remoteList.slice(0, MAX_DISPLAY_WISHES));
+                            renderRecentWishes();
+                        }
+                    })
+                    .catch(() => { });
+            }
+
+            // 2. Đọc trực tiếp từ link docs.google.com/spreadsheets/d/1ZT4LMdo18QoWVrwP-hQnDRPTrfp5oepGPY6gL3kubtY
+            const info = extractSheetIdAndGid(GOOGLE_SHEET_URL);
+            if (!info) return;
+
+            window.__handleGoogleSheetWishes = function (response) {
+                try {
+                    if (!response || !response.table || !Array.isArray(response.table.rows)) return;
+                    const rawRows = response.table.rows.map(rowObj => {
+                        if (!rowObj || !Array.isArray(rowObj.c)) return [];
+                        return rowObj.c.map(cell => {
+                            if (!cell) return "";
+                            return cell.f != null ? cell.f : (cell.v != null ? cell.v : "");
+                        });
+                    });
+
+                    const wishesFromDoc = parseRowsToWishes(rawRows);
+                    if (wishesFromDoc.length > 0) {
+                        // Đảo ngược để lấy 5 người mới nhất (cuối bảng tính) đưa lên đầu
+                        const latestFive = wishesFromDoc.reverse().slice(0, MAX_DISPLAY_WISHES);
+                        saveStoredWishes(latestFive);
+                        renderRecentWishes();
+                    }
+                } catch (err) {
+                    console.warn("Lỗi xử lý dữ liệu từ Google Sheet:", err);
+                }
+            };
+
+            const oldScript = document.getElementById('google-sheet-jsonp');
+            if (oldScript) oldScript.remove();
+
+            const script = document.createElement('script');
+            script.id = 'google-sheet-jsonp';
+            script.src = `https://docs.google.com/spreadsheets/d/${info.sheetId}/gviz/tq?gid=${info.gid}&tqx=out:json;responseHandler:__handleGoogleSheetWishes&_=${Date.now()}`;
+            document.body.appendChild(script);
+        }
+
+        async function submitWish(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById('wish-name');
+            const contentInput = document.getElementById('wish-content');
+            const submitBtn = document.getElementById('wish-submit-btn');
+            const name = nameInput.value.trim();
+            const content = contentInput.value.trim();
+            if (!name || !content) return;
+
+            const newEntry = {
+                name: name,
+                content: content,
+                time: formatNowTimestamp()
+            };
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = "ĐANG GỬI...";
+            }
+
+            // 1. Lưu & hiển thị ngay trong top 5 người gần nhất trên màn hình
+            const allWishes = getStoredWishes();
+            allWishes.unshift(newEntry);
+            saveStoredWishes(allWishes.slice(0, MAX_DISPLAY_WISHES));
+            renderRecentWishes();
+
+            // 2. Gửi dữ liệu lên Google Sheet Apps Script (hỗ trợ cả mở trực tiếp file:// và http://)
+            const targetPostUrl = APPS_SCRIPT_WEBAPP_URL || (GOOGLE_SHEET_URL.includes("script.google.com") ? GOOGLE_SHEET_URL : "");
+            if (targetPostUrl) {
+                try {
+                    const formBody = new URLSearchParams();
+                    formBody.append("time", newEntry.time);
+                    formBody.append("name", newEntry.name);
+                    formBody.append("content", newEntry.content);
+
+                    await fetch(targetPostUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: formBody
+                    });
+                    // Đợi 1.2 giây để Google Sheet lưu xong rồi tự động đọc lại 5 người mới nhất từ file
+                    setTimeout(loadRecentWishesFromGoogleDoc, 1200);
+                } catch (err) {
+                    // Dự phòng bằng form ẩn nếu trình duyệt chặn fetch từ file://
+                    try {
+                        const iframeName = "hidden_sheet_iframe_" + Date.now();
+                        const iframe = document.createElement("iframe");
+                        iframe.name = iframeName;
+                        iframe.style.display = "none";
+                        document.body.appendChild(iframe);
+
+                        const tempForm = document.createElement("form");
+                        tempForm.method = "POST";
+                        tempForm.action = targetPostUrl;
+                        tempForm.target = iframeName;
+                        tempForm.style.display = "none";
+
+                        ["time", "name", "content"].forEach(key => {
+                            const input = document.createElement("input");
+                            input.type = "hidden";
+                            input.name = key;
+                            input.value = newEntry[key];
+                            tempForm.appendChild(input);
+                        });
+
+                        document.body.appendChild(tempForm);
+                        tempForm.submit();
+                        setTimeout(() => {
+                            tempForm.remove();
+                            iframe.remove();
+                            loadRecentWishesFromGoogleDoc();
+                        }, 2000);
+                    } catch (e2) {
+                        console.warn("Không thể gửi lên Google Sheet:", e2);
+                    }
+                }
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "GỬI LỜI CHÚC";
+            }
+
+            e.target.reset();
+            showToast(`Cảm ơn ${name}! Lời chúc của bạn đã được gửi tới Quốc Huy & Hồng Ngọc ❤️`);
+        }
+
+        renderRecentWishes();
+        loadRecentWishesFromGoogleDoc();
+
+        /* ---------------- 4. ACTIONS: CALENDAR, MODAL, MUSIC ---------------- */
+        function showToast(message) {
+            const toast = document.getElementById('toast-box');
+            toast.innerText = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 4000);
+        }
+
+        function addToCalendar() {
+            const googleCalUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" +
+                encodeURIComponent("Lễ Cưới Nguyễn Quốc Huy & Nguyễn Hồng Ngọc") +
+                "&dates=20261128T090000Z/20261129T050000Z" +
+                "&details=" + encodeURIComponent("Trân trọng kính mời quý vị đến dự Lễ Cưới của Nguyễn Quốc Huy (Cẩm Hoàng - Xuân Cẩm - Bắc Ninh) & Nguyễn Hồng Ngọc (Cẩm Bào - Xuân Cẩm - Bắc Ninh).") +
+                "&location=" + encodeURIComponent("Xuân Cẩm, Bắc Ninh");
+            window.open(googleCalUrl, '_blank');
+            showToast("Đã mở trang lưu lịch Google Calendar ngày 28-29/11/2026!");
+        }
+
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.toggle('hidden');
+        }
+
+        function copyBankNumber(stk, ownerName) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(stk).catch(() => { });
+            }
+            alert(`Đã sao chép số tài khoản ${stk} (${ownerName})!`);
+        }
+
+        let musicPlaying = false;
+        function updateMusicUI(playing) {
+            const icon = document.getElementById('music-icon');
+            musicPlaying = playing;
+            if (icon) {
+                icon.className = playing ? "fa-solid fa-music text-sm animate-bounce" : "fa-solid fa-volume-xmark text-sm";
+            }
+        }
+
+        function tryAutoPlayMusic() {
+            const audio = document.getElementById('bg-music');
+            if (!audio || musicPlaying) return;
+            audio.play().then(() => {
+                updateMusicUI(true);
+            }).catch(() => {
+                // Nếu trình duyệt chặn autoplay khi chưa chạm, sẽ phát ngay khi người dùng chạm/click bất kỳ đâu trên trang
+                const unlockAudio = () => {
+                    if (!musicPlaying) {
+                        audio.play().then(() => updateMusicUI(true)).catch(() => { });
+                    }
+                    window.removeEventListener('click', unlockAudio);
+                    window.removeEventListener('touchstart', unlockAudio);
+                    window.removeEventListener('keydown', unlockAudio);
+                };
+                window.addEventListener('click', unlockAudio, { once: true });
+                window.addEventListener('touchstart', unlockAudio, { once: true });
+                window.addEventListener('keydown', unlockAudio, { once: true });
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', tryAutoPlayMusic);
+
+        function toggleMusic() {
+            const audio = document.getElementById('bg-music');
+            if (musicPlaying) {
+                audio.pause();
+                updateMusicUI(false);
+            } else {
+                audio.play().then(() => updateMusicUI(true)).catch(() => { });
+            }
+        }
+
+        /* ---------------- 4. OPENING INVITATION CARD EFFECT ---------------- */
+        let isEnvelopeOpening = false;
+
+        function openWeddingInvitation() {
+            if (isEnvelopeOpening) return;
+            isEnvelopeOpening = true;
+
+            const overlay = document.getElementById('invitation-overlay');
+            const body = document.getElementById('page-body');
+            const heroHeader = document.getElementById('hero-header');
+
+            overlay.classList.add('card-opened');
+
+            // Burst celebration petals from the center of the card when opening
+            burstCelebrationPetals();
+
+            if (!musicPlaying) {
+                const audio = document.getElementById('bg-music');
+                const icon = document.getElementById('music-icon');
+                audio.play().then(() => {
+                    icon.className = "fa-solid fa-music text-sm animate-bounce";
+                    musicPlaying = true;
+                }).catch(() => { });
+            }
+
+            setTimeout(() => {
+                overlay.classList.add('overlay-hidden');
+                body.classList.remove('overflow-hidden');
+                if (heroHeader) heroHeader.classList.add('hero-visible');
+                triggerScrollReveal();
+            }, 680);
+        }
+
+        function replayEnvelope() {
+            const overlay = document.getElementById('invitation-overlay');
+            const body = document.getElementById('page-body');
+            const heroHeader = document.getElementById('hero-header');
+
+            isEnvelopeOpening = false;
+            overlay.classList.remove('card-opened', 'overlay-hidden');
+            if (heroHeader) heroHeader.classList.remove('hero-visible');
+            body.classList.add('overflow-hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* ---------------- 5. SCROLL REVEAL ---------------- */
+        function triggerScrollReveal() {
+            const sections = document.querySelectorAll('.reveal-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                    }
+                });
+            }, { threshold: 0.12 });
+
+            sections.forEach(sec => observer.observe(sec));
+        }
+        window.addEventListener('DOMContentLoaded', triggerScrollReveal);
+
+        /* ---------------- 6. FALLING PETALS CANVAS (FROM Hieuunghoaroi.png) ---------------- */
+        const canvas = document.getElementById('petals-canvas');
+        const ctx = canvas.getContext('2d');
+        let petalsActive = true;
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Preload real extracted petal & leaf sprites from image2/Hieuunghoaroi.png
+        const petalSpriteSources = [
+            'image2/canh-hoa-1.png', // Deep burgundy rose petal
+            'image2/canh-hoa-2.png', // Crimson sideways petal
+            'image2/canh-hoa-3.png', // Soft beige leaf
+            'image2/canh-hoa-4.png', // Warm cream rose petal
+            'image2/canh-hoa-5.png', // Translucent dried leaf
+            'image2/canh-hoa-6.png'  // Golden blush petal
+        ];
+        const petalSprites = petalSpriteSources.map(src => {
+            const img = new Image();
+            img.src = src;
+            return img;
+        });
+
+        class PetalParticle {
+            constructor(randomY = true, isBurst = false) {
+                this.reset(randomY, isBurst);
+            }
+            reset(randomY = false, isBurst = false) {
+                this.isBurst = isBurst;
+                this.sprite = petalSprites[Math.floor(Math.random() * petalSprites.length)];
+                this.size = Math.random() * 14 + 14; // 14px - 28px realistic petal size
+                this.angle = Math.random() * Math.PI * 2;
+                this.spinSpeed = (Math.random() * 0.028 - 0.014);
+                this.flipPhase = Math.random() * Math.PI * 2;
+                this.flipSpeed = Math.random() * 0.03 + 0.012;
+                this.time = Math.random() * 100;
+                this.opacity = Math.random() * 0.25 + 0.72;
+
+                if (isBurst) {
+                    // Burst outward from the center of the opening invitation card
+                    this.x = canvas.width * 0.5 + (Math.random() * 120 - 60);
+                    this.y = canvas.height * 0.5 + (Math.random() * 80 - 40);
+                    const burstAngle = Math.random() * Math.PI * 2;
+                    const burstSpeed = Math.random() * 5.5 + 2.2;
+                    this.vx = Math.cos(burstAngle) * burstSpeed;
+                    this.vy = Math.sin(burstAngle) * burstSpeed - 2.2; // slight upward lift
+                    this.gravity = 0.085;
+                    this.drag = 0.975;
+                } else {
+                    this.x = Math.random() * canvas.width;
+                    this.y = randomY ? Math.random() * canvas.height : -35;
+                    this.speedY = Math.random() * 0.85 + 0.45;
+                    this.speedX = Math.random() * 0.5 - 0.25;
+                    this.swayAmp = Math.random() * 0.7 + 0.25;
+                }
+            }
+            update() {
+                this.time += 0.018;
+                this.angle += this.spinSpeed;
+                this.flipPhase += this.flipSpeed;
+
+                if (this.isBurst) {
+                    this.vx *= this.drag;
+                    this.vy = this.vy * this.drag + this.gravity;
+                    this.x += this.vx + Math.sin(this.time) * 0.4;
+                    this.y += this.vy;
+                    if (this.y > canvas.height + 40) {
+                        this.dead = true;
+                    }
+                } else {
+                    this.y += this.speedY;
+                    this.x += this.speedX + Math.sin(this.time) * this.swayAmp;
+                    if (this.y > canvas.height + 35) this.reset(false, false);
+                    if (this.x > canvas.width + 35) this.x = -30;
+                    if (this.x < -35) this.x = canvas.width + 30;
+                }
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                // 3D fluttering scale effect
+                const flipScale = 0.65 + 0.35 * Math.cos(this.flipPhase);
+                ctx.scale(1, flipScale);
+                ctx.globalAlpha = this.opacity;
+
+                if (this.sprite && this.sprite.complete && this.sprite.naturalWidth > 0) {
+                    const aspect = this.sprite.naturalHeight / this.sprite.naturalWidth;
+                    const w = this.size;
+                    const h = this.size * aspect;
+                    ctx.drawImage(this.sprite, -w / 2, -h / 2, w, h);
+                } else {
+                    ctx.fillStyle = 'rgba(218, 195, 172, 0.8)';
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, this.size * 0.35, this.size * 0.5, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+        }
+
+        // Gentle continuous stream of 26 real petals
+        for (let i = 0; i < 26; i++) {
+            particles.push(new PetalParticle(true, false));
+        }
+
+        // Burst 34 extra petals when opening the invitation card
+        function burstCelebrationPetals() {
+            for (let i = 0; i < 34; i++) {
+                particles.push(new PetalParticle(false, true));
+            }
+        }
+
+        function animatePetals() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (petalsActive) {
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.update();
+                    if (p.dead) {
+                        particles.splice(i, 1);
+                    } else {
+                        p.draw();
+                    }
+                }
+            }
+            requestAnimationFrame(animatePetals);
+        }
+        animatePetals();
+
+        function togglePetals() {
+            petalsActive = !petalsActive;
+            const btn = document.getElementById('petals-btn');
+            if (petalsActive) {
+                btn.classList.remove('opacity-50');
+                showToast("Đã bật hiệu ứng cánh hoa rơi");
+            } else {
+                btn.classList.add('opacity-50');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                showToast("Đã tạm dừng hiệu ứng cánh hoa rơi");
+            }
+        }
+    </script>
+</body>
+
+</html>
