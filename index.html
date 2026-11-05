@@ -129,9 +129,11 @@
             transform-origin: bottom center;
         }
 
-        /* Opening Invitation Modal Overlay Transition */
+        /* Opening Invitation Modal Overlay & 3D Envelope Matching Card Tone (#EDE2D3 / #6E5A4F / #4E3D34) */
         #invitation-overlay {
-            background: radial-gradient(circle at center, #F3E9DC 0%, #E5D4C0 100%);
+            background-color: #F4ECE1;
+            background-image: radial-gradient(rgba(110, 90, 79, 0.16) 1px, transparent 1px);
+            background-size: 16px 16px;
             perspective: 1400px;
             transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.9s;
         }
@@ -142,71 +144,223 @@
             pointer-events: none;
         }
 
-        .opening-card {
-            background: radial-gradient(circle at center, #FFFDF9 35%, #F4EBE0 100%);
-            transform-style: preserve-3d;
-            transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.85s ease, box-shadow 0.85s ease;
-            box-shadow: 0 20px 45px -10px rgba(92, 75, 65, 0.22), inset 0 0 24px rgba(197, 155, 109, 0.12);
-        }
-
-        .card-opened .opening-card {
-            transform: translateY(-28px) scale(1.08) rotateX(12deg);
-            opacity: 0;
-            box-shadow: 0 35px 70px -12px rgba(92, 75, 65, 0.35);
-        }
-
-        .opening-card .edge-flower-left {
-            transform-origin: bottom center;
-            transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        .opening-card .edge-flower-right {
-            transform-origin: bottom center;
-            transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        .card-opened .opening-card .edge-flower-left {
-            transform: translateX(-14px) rotate(-6deg) scale(1.05);
-        }
-
-        .card-opened .opening-card .edge-flower-right {
-            transform: translateX(14px) rotate(6deg) scale(1.05);
-        }
-
-        .seal-heart-badge {
+        .envelope-stage {
             position: relative;
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 0 0 3.5px #FAF4EC, 0 0 0 5px #D2B89A, 0 6px 14px rgba(90, 68, 54, 0.25);
+            width: 310px;
+            height: 215px;
+            margin: 0 auto;
+            perspective: 1200px;
         }
 
-        .seal-heart-badge::after {
-            content: '';
-            position: absolute;
-            inset: -7px;
-            border-radius: 9999px;
-            border: 1px solid rgba(197, 155, 109, 0.55);
-            animation: sealPulseRing 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
+        /* Envelope Shake / Wobble Animation before opening */
+        @keyframes envelopeShake {
 
-        @keyframes sealPulseRing {
-            0% {
-                transform: scale(0.92);
-                opacity: 0.85;
+            0%,
+            100% {
+                transform: translateX(0) rotate(0deg);
+            }
+
+            15% {
+                transform: translateX(-8px) rotate(-4deg);
+            }
+
+            30% {
+                transform: translateX(8px) rotate(4deg);
+            }
+
+            45% {
+                transform: translateX(-6px) rotate(-3deg);
+            }
+
+            60% {
+                transform: translateX(6px) rotate(3deg);
             }
 
             75% {
-                transform: scale(1.38);
-                opacity: 0;
+                transform: translateX(-3px) rotate(-1.5deg);
             }
 
-            100% {
-                transform: scale(1.38);
-                opacity: 0;
+            90% {
+                transform: translateX(3px) rotate(1.5deg);
             }
         }
 
-        .card-opened .seal-heart-badge {
-            transform: scale(1.35) rotate(12deg);
+        @keyframes envelopeGentleHint {
+
+            0%,
+            86%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            89% {
+                transform: rotate(-2deg) translateY(-2px);
+            }
+
+            92% {
+                transform: rotate(2deg) translateY(-2px);
+            }
+
+            95% {
+                transform: rotate(-1.5deg);
+            }
+
+            98% {
+                transform: rotate(1.5deg);
+            }
+        }
+
+        .envelope-stage {
+            animation: envelopeGentleHint 4.5s ease-in-out infinite;
+        }
+
+        .envelope-shaking .envelope-stage {
+            animation: envelopeShake 0.52s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
+        }
+
+        .card-opened .envelope-stage {
+            animation: none;
+        }
+
+        /* Back wall of the envelope (Crimson Wedding Red) */
+        .env-back {
+            position: absolute;
+            inset: 0;
+            background: #6E1418;
+            border-radius: 6px;
+            box-shadow: 0 22px 44px -10px rgba(95, 16, 20, 0.42);
+            z-index: 1;
+        }
+
+        /* Inner cream invitation card that slides up when opened */
+        .env-letter-card {
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            bottom: 12px;
+            height: 196px;
+            background: #FAF6F0;
+            border-radius: 6px;
+            padding: 7px;
+            box-shadow: 0 6px 20px rgba(80, 12, 16, 0.24);
+            z-index: 2;
+            transform: translateY(0);
+            transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.32s, box-shadow 0.95s ease 0.32s;
+        }
+
+        .card-opened .env-letter-card {
+            transform: translateY(-96px);
+            box-shadow: 0 14px 32px rgba(80, 12, 16, 0.3);
+        }
+
+        /* Crimson & Cream Floral Bouquet Blooming Behind the Left Side When Envelope Opens */
+        .env-bloom-left {
+            position: absolute;
+            left: -48px;
+            top: -55px;
+            width: 145px;
+            height: auto;
+            z-index: 2;
+            opacity: 0;
+            transform: translate(42px, 58px) scale(0.42) rotate(14deg);
+            transform-origin: bottom center;
+            transition: transform 0.92s cubic-bezier(0.22, 1, 0.36, 1) 0.2s,
+                opacity 0.6s ease 0.2s;
+            pointer-events: none;
+            filter: drop-shadow(0 8px 16px rgba(65, 10, 14, 0.28));
+        }
+
+        .card-opened .env-bloom-left {
+            opacity: 1;
+            transform: translate(-12px, -32px) scale(1.05) rotate(-6deg);
+        }
+
+        /* Front left & right flaps + bottom pocket flap (Luxury Wedding Red / Burgundy) */
+        .env-pocket-left {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #9B2226 0%, #821B1F 100%);
+            clip-path: polygon(0 0, 52% 52%, 0 100%);
+            border-radius: 6px;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .env-pocket-right {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(225deg, #9B2226 0%, #821B1F 100%);
+            clip-path: polygon(100% 0, 48% 52%, 100% 100%);
+            border-radius: 6px;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .env-pocket-bottom {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, #78171B 0%, #921E22 100%);
+            clip-path: polygon(0 100%, 50% 47%, 100% 100%);
+            border-radius: 6px;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        /* Subtle diagonal warm gold seam lines on the pocket */
+        .env-pocket-seams {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        /* Top triangular flap with gold polka-dot pattern */
+        .env-flap-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 56%;
+            background-color: #A4262B;
+            background-image: radial-gradient(rgba(235, 200, 152, 0.45) 1px, transparent 1px);
+            background-size: 9px 9px;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            transform-origin: top center;
+            transform: rotateX(0deg);
+            transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s 0.32s;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .card-opened .env-flap-top {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        /* Gold Wax Seal with Monogram */
+        .env-wax-seal {
+            position: absolute;
+            top: 53%;
+            left: 50%;
+            width: 58px;
+            height: 58px;
+            transform: translate(-50%, -50%);
+            border-radius: 9999px;
+            background: radial-gradient(circle at 32% 30%, #E7C89E 0%, #C59B6D 55%, #9B7142 100%);
+            box-shadow: 0 5px 14px rgba(58, 42, 32, 0.42), inset 0 1px 3px rgba(255, 245, 225, 0.78);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 6;
+            transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+        }
+
+        .card-opened .env-wax-seal {
+            transform: translate(-50%, -50%) scale(0.5);
+            opacity: 0;
+            pointer-events: none;
         }
 
         .open-shimmer-ring {
@@ -251,11 +405,11 @@
             transform: translateY(0) scale(1);
         }
 
-        /* Scroll reveal animations */
+        /* Scroll reveal animations (Staggered text & element reveal on scroll) */
         .reveal-section {
             opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+            transform: translateY(36px);
+            transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .reveal-section.revealed {
@@ -263,15 +417,22 @@
             transform: translateY(0);
         }
 
-        .reveal-item {
+        .reveal-item,
+        .scroll-text-reveal {
             opacity: 0;
-            transform: translateY(18px);
-            transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+            transform: translateY(22px) scale(0.98);
+            filter: blur(3px);
+            transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: opacity, transform, filter;
         }
 
-        .revealed .reveal-item {
+        .revealed .reveal-item,
+        .scroll-text-reveal.is-visible {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
+            filter: blur(0px);
         }
 
         .delay-100 {
@@ -302,6 +463,54 @@
         ::-webkit-scrollbar-thumb {
             background: #6E5A4F;
             border-radius: 4px;
+        }
+
+        /* Touch / Click Floating Gradient Pink Hearts & Sparkle Dots Effect */
+        .touch-heart-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            user-select: none;
+            will-change: transform, opacity;
+            animation: touchHeartFloat var(--dur, 1.15s) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .touch-sparkle-dot {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            border-radius: 9999px;
+            will-change: transform, opacity;
+            animation: touchSparkleBurst var(--dur, 0.95s) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes touchHeartFloat {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.25) rotate(var(--rot-start, 0deg));
+            }
+
+            20% {
+                opacity: var(--max-op, 0.92);
+                transform: translate(calc(-50% + var(--tx, 0px) * 0.35), calc(-50% + var(--ty, -40px) * 0.35)) scale(1.08) rotate(var(--rot-mid, -8deg));
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, -85px))) scale(var(--end-scale, 0.75)) rotate(var(--rot-end, 12deg));
+            }
+        }
+
+        @keyframes touchSparkleBurst {
+            0% {
+                opacity: 0.95;
+                transform: translate(-50%, -50%) scale(0.3);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) scale(1.1);
+            }
         }
     </style>
 </head>
@@ -335,68 +544,123 @@
         </button>
     </div>
 
-    <!-- ==================== MÀN HÌNH MỞ THIỆP (GIỐNG MẪU MỚI) ==================== -->
+    <!-- ==================== MÀN HÌNH MỞ THIỆP (PHONG BÌ NÂU 3D TRƯỢT THIỆP LÊN GIỐNG MẪU) ==================== -->
     <div id="invitation-overlay"
         class="fixed inset-0 z-50 flex items-center justify-center p-4 select-none overflow-hidden">
 
-        <!-- White Cream Horizontal Card with White Rose & Baby's Breath Bouquets Rising from Bottom Corners -->
-        <div id="interactive-envelope"
-            class="opening-card relative w-full max-w-[440px] rounded-2xl border-2 border-[#D5BE9F] px-8 py-8 text-center overflow-hidden cursor-pointer"
+        <div id="interactive-envelope" class="relative w-full max-w-[430px] pt-8 pb-6 px-4 text-center cursor-pointer"
             onclick="openWeddingInvitation()">
 
-            <!-- Subtle Inner Gold Frame Border -->
-            <div class="absolute inset-1.5 rounded-xl border border-[#E5D4BE]/80 pointer-events-none z-20"></div>
+            <!-- Architectural Minimalist Castle/Church Line Art Behind Envelope -->
+            <svg class="absolute inset-x-0 bottom-4 w-[350px] h-[380px] mx-auto pointer-events-none opacity-45 z-0"
+                viewBox="0 0 360 390" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Center Peak -->
+                <path d="M115 160 L180 65 L245 160" stroke="#C7B9A8" stroke-width="1.2" />
+                <line x1="115" y1="160" x2="115" y2="375" stroke="#C7B9A8" stroke-width="1.1" />
+                <line x1="245" y1="160" x2="245" y2="375" stroke="#C7B9A8" stroke-width="1.1" />
+                <!-- Left Tower Spire -->
+                <path d="M52 195 L68 92 L84 195" stroke="#C7B9A8" stroke-width="1.1" />
+                <line x1="52" y1="195" x2="52" y2="375" stroke="#C7B9A8" stroke-width="1.1" />
+                <line x1="84" y1="195" x2="84" y2="375" stroke="#C7B9A8" stroke-width="1.1" />
+                <!-- Right Tower Spire -->
+                <path d="M276 195 L292 92 L308 195" stroke="#C7B9A8" stroke-width="1.1" />
+                <line x1="276" y1="195" x2="276" y2="375" stroke="#C7B9A8" stroke-width="1.1" />
+                <line x1="308" y1="195" x2="308" y2="375" stroke="#C7B9A8" stroke-width="1.1" />
+                <!-- Bottom Ground Line -->
+                <line x1="20" y1="375" x2="340" y2="375" stroke="#C7B9A8" stroke-width="1.2" />
+            </svg>
 
             <!-- Radial Shimmer Burst when clicked -->
             <div class="open-shimmer-ring"></div>
 
-            <!-- Left White Rose & Baby's Breath Bouquet (Rising from Bottom-Left) -->
-            <img src="image2/hoa-mo-thiep-trai.png" alt="Hoa trắng trái"
-                class="edge-flower-left absolute left-1.5 bottom-1.5 w-[112px] sm:w-[126px] h-[85%] object-contain object-bottom pointer-events-none select-none z-10" />
-
-            <!-- Right White Rose & Baby's Breath Bouquet (Rising from Bottom-Right) -->
-            <img src="image2/hoa-mo-thiep-phai.png" alt="Hoa trắng phải"
-                class="edge-flower-right absolute right-1.5 bottom-1.5 w-[112px] sm:w-[126px] h-[82%] object-contain object-bottom pointer-events-none select-none z-10" />
-
-            <!-- Top Dark Brown Circle with Gold Double Ring & White Heart -->
-            <div
-                class="seal-heart-badge relative z-20 w-12 h-12 rounded-full bg-[#5C4436] text-white flex items-center justify-center mx-auto mb-5">
-                <i class="fa-solid fa-heart text-base"></i>
-            </div>
-
-            <!-- Couple Names -->
-            <div class="relative z-20">
-                <h1 class="font-serif text-3xl sm:text-[36px] text-[#4E3B30] font-semibold leading-tight tracking-wide">
-                    Quốc Huy
+            <!-- Top Header Text Above Envelope -->
+            <div class="relative z-10 mb-12">
+                <p class="text-[11px] tracking-[0.28em] uppercase text-[#5A4336] font-semibold mb-2">
+                    WEDDING INVITATION
+                </p>
+                <h1
+                    class="font-serif text-[32px] sm:text-[36px] text-[#4A3427] font-normal tracking-wide leading-tight">
+                    Quốc Huy <span class="font-serif italic text-[#C59B6D] font-normal mx-1">&amp;</span> Hồng Ngọc
                 </h1>
-                <span class="block font-serif italic text-lg text-[#B5926B] my-1">&amp;</span>
-                <h1 class="font-serif text-3xl sm:text-[36px] text-[#4E3B30] font-semibold leading-tight tracking-wide">
-                    Hồng Ngọc
-                </h1>
+                <p class="font-serif italic text-xs text-[#6E5A4F] tracking-widest mt-1.5">
+                    29 . 11 . 2026
+                </p>
             </div>
 
-            <!-- Tiny Gold Leaf Divider -->
-            <div class="relative z-20 flex items-center justify-center gap-3 my-4">
-                <span class="w-11 h-[1px] bg-[#C8B299]"></span>
-                <i class="fa-solid fa-seedling text-[10px] text-[#B89468]"></i>
-                <span class="w-11 h-[1px] bg-[#C8B299]"></span>
+            <!-- 3D Interactive Red Envelope Container -->
+            <div class="envelope-stage relative z-20 my-2">
+                <!-- Back of Envelope -->
+                <div class="env-back"></div>
+
+                <!-- Crimson & Champagne Floral Bouquet (Blooms out behind the left side when envelope opens) -->
+                <img src="image2/hoa-phong-bi-do.png" alt="Hoa nở mở phong bì trái" class="env-bloom-left" />
+
+                <!-- Inner Cream Invitation Card (Slides up when envelope opens) -->
+                <div class="env-letter-card">
+                    <div
+                        class="w-full h-full border border-[#DFD3C3] rounded-xs px-3 pt-3 pb-2 flex flex-col items-center justify-start text-center bg-[#FAF6F0]">
+                        <p class="font-serif italic text-[9px] text-[#7A685B] tracking-widest mb-1">
+                            29 . 11 . 2026
+                        </p>
+                        <p class="text-[8px] tracking-[0.22em] uppercase text-[#7A685B] font-semibold mb-1.5">
+                            TRÂN TRỌNG KÍNH MỜI
+                        </p>
+                        <p class="font-serif text-[16px] text-[#4A3427] font-semibold leading-snug">
+                            Nguyễn Quốc Huy
+                        </p>
+                        <span class="font-serif italic text-xs text-[#C59B6D] my-0.5">&amp;</span>
+                        <p class="font-serif text-[16px] text-[#4A3427] font-semibold leading-snug mb-2">
+                            Nguyễn Hồng Ngọc
+                        </p>
+                        <div class="w-24 h-[1px] bg-[#D8CBB8] mb-1.5"></div>
+                        <p class="text-[9px] tracking-[0.25em] font-bold text-[#5A4336]">
+                            29 . 11 . 2026
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Envelope Left & Right Side Flaps -->
+                <div class="env-pocket-left"></div>
+                <div class="env-pocket-right"></div>
+
+                <!-- Envelope Bottom Flap -->
+                <div class="env-pocket-bottom"></div>
+
+                <!-- Diagonal Warm Gold/Beige Seam Lines on Front Flaps -->
+                <svg class="env-pocket-seams" viewBox="0 0 310 215" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="2" y1="213" x2="155" y2="102" stroke="#C59B6D" stroke-width="1.3" stroke-opacity="0.65" />
+                    <line x1="308" y1="213" x2="155" y2="102" stroke="#C59B6D" stroke-width="1.3"
+                        stroke-opacity="0.65" />
+                    <!-- Subtle inner diamond lip at center -->
+                    <path d="M138 114 L155 101 L172 114 L155 125 Z" stroke="#C59B6D" stroke-width="1.1"
+                        stroke-opacity="0.65" fill="none" />
+                </svg>
+
+                <!-- Top Triangular Flap with Polka Dots (Rotates open in 3D) -->
+                <div class="env-flap-top"></div>
+
+                <!-- Gold Wax Seal in the Center (H&N + Heart) -->
+                <div class="env-wax-seal">
+                    <div
+                        class="w-[46px] h-[46px] rounded-full border border-[#78532B]/55 flex flex-col items-center justify-center pt-0.5">
+                        <span
+                            class="font-script text-[17px] text-[#4A3018] leading-none font-bold tracking-tighter">H&amp;N</span>
+                        <i class="fa-solid fa-heart text-[6px] text-[#4A3018] mt-0.5"></i>
+                    </div>
+                </div>
             </div>
 
-            <!-- Wedding Date -->
-            <p class="relative z-20 font-serif text-[15px] text-[#5C4B41] tracking-wider mb-2.5">
-                29 tháng 11, 2026
-            </p>
-
-            <!-- Thân Mời -->
-            <p class="relative z-20 font-serif italic text-xs text-[#6E5A4F] mb-5">
-                Thân Mời
-            </p>
-
-            <!-- Mở Thiệp Pill Button -->
-            <button type="button"
-                class="relative z-20 inline-flex items-center justify-center px-9 py-2.5 rounded-full bg-[#5C4436] text-white text-xs font-medium tracking-wider shadow-md hover:bg-[#4A3529] hover:scale-105 transition-all cursor-pointer">
-                Mở thiệp
-            </button>
+            <!-- Bottom Action Pill Button & Subtitle -->
+            <div class="relative z-20 mt-10">
+                <button type="button"
+                    class="inline-flex items-center justify-center gap-2.5 px-8 py-2.5 rounded-full bg-[#8E1E22] text-[#FAF6F0] text-[11px] font-semibold uppercase tracking-[0.15em] shadow-md hover:bg-[#74161A] hover:scale-105 transition-all cursor-pointer">
+                    <i class="fa-solid fa-mobile-screen-button text-xs text-[#F1D7B4] animate-bounce"></i>
+                    <span>CHẠM HOẶC LẮC ĐỂ MỞ THIỆP</span>
+                </button>
+                <p class="font-serif italic text-[11px] text-[#7A685B] mt-3">
+                    Trân trọng kính mời Quý khách
+                </p>
+            </div>
         </div>
     </div>
 
@@ -920,52 +1184,71 @@
             </footer>
         </section>
 
-        <!-- MODAL HỘP MỪNG CƯỚI (QR CODE) -->
-        <div id="gift-modal"
-            class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <!-- MODAL HỘP MỪNG CƯỚI (QR CODE - RESPONSIVE GỌN ĐẸP TRÊN ĐIỆN THOẠI) -->
+        <div id="gift-modal" onclick="if(event.target === this) toggleModal('gift-modal')"
+            class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4">
             <div
-                class="bg-[#FAF7F2] text-[#4E3D34] max-w-md w-full rounded-xl p-5 sm:p-6 shadow-2xl border border-[#DED0BD] relative text-center">
-                <button onclick="toggleModal('gift-modal')"
-                    class="absolute top-3 right-4 text-[#6E5A4F] hover:text-[#4E3D34] text-lg cursor-pointer">
-                    <i class="fa-solid fa-xmark"></i>
+                class="bg-[#FAF7F2] text-[#4E3D34] max-w-[405px] sm:max-w-md w-full max-h-[90vh] overflow-y-auto rounded-2xl p-3 sm:p-6 shadow-2xl border border-[#DED0BD] relative text-center">
+                <!-- Nút đóng X cố định góc trên phải, nổi bật dễ bấm trên điện thoại -->
+                <button type="button" onclick="toggleModal('gift-modal')" aria-label="Đóng hộp quà"
+                    class="sticky sm:absolute top-0 right-0 ml-auto -mb-6 sm:mb-0 sm:top-3 sm:right-3 z-20 w-8 h-8 rounded-full bg-[#EDE2D3] text-[#4E3D34] hover:bg-[#6E5A4F] hover:text-white flex items-center justify-center shadow-sm transition cursor-pointer">
+                    <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
-                <h3 class="font-serif text-2xl font-bold text-[#4E3D34] mb-1">Hộp Quà Mừng Cưới</h3>
-                <p class="text-xs text-[#7A685B] mb-5">Cảm ơn tình cảm quý báu của quý khách dành cho vợ chồng chúng
-                    mình!</p>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <h3 class="font-serif text-xl sm:text-2xl font-bold text-[#4E3D34] mb-1 pr-6 sm:pr-0">Hộp Quà Mừng Cưới
+                </h3>
+                <p class="text-[11px] sm:text-xs text-[#7A685B] mb-3">
+                    Cảm ơn tình cảm quý báu của quý khách dành cho vợ chồng chúng mình!
+                </p>
+
+                <!-- Luôn chia 2 cột gọn gàng ngay cả trên màn hình điện thoại, ảnh QR mở rộng tối đa -->
+                <div class="grid grid-cols-2 gap-2 sm:gap-3.5">
                     <!-- QR Chú Rể -->
-                    <div class="bg-white p-3.5 rounded-xl border border-[#DED0BD] shadow-xs flex flex-col items-center">
-                        <p class="text-[11px] font-bold uppercase tracking-wider text-[#4E3D34] mb-2">Chú Rể: Quốc Huy
-                        </p>
-                        <div
-                            class="w-full max-w-[175px] rounded-lg overflow-hidden border border-[#EDE2D3] bg-white flex items-center justify-center p-1 mb-2">
-                            <img src="image2/qr-chu-re.png" alt="QR Chú Rể Nguyễn Quốc Huy"
-                                class="w-full h-auto object-contain">
+                    <div
+                        class="bg-white p-2 sm:p-3.5 rounded-xl border border-[#DED0BD] shadow-xs flex flex-col items-center justify-between">
+                        <div class="w-full flex flex-col items-center">
+                            <p
+                                class="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-[#4E3D34] mb-1.5">
+                                Chú Rể: Quốc Huy
+                            </p>
+                            <div
+                                class="w-full aspect-square max-w-[162px] sm:max-w-[175px] rounded-lg overflow-hidden border border-[#EDE2D3] bg-white flex items-center justify-center p-0.5 mb-1.5">
+                                <img src="image2/qr-chu-re.png" alt="QR Chú Rể Nguyễn Quốc Huy"
+                                    class="w-full h-full object-contain">
+                            </div>
+                            <p class="text-[10px] sm:text-[11px] font-bold text-[#4E3D34] uppercase leading-tight">
+                                NGUYEN QUOC HUY</p>
+                            <p class="text-[11.5px] sm:text-xs font-bold text-[#6E5A4F] tracking-wide my-0.5">0969762425
+                            </p>
+                            <p class="text-[9.5px] sm:text-[10px] text-[#7A685B] mb-2">MB Bank</p>
                         </div>
-                        <p class="text-[11px] font-bold text-[#4E3D34] uppercase">NGUYEN QUOC HUY</p>
-                        <p class="text-xs font-bold text-[#6E5A4F] tracking-wide my-0.5">0969762425</p>
-                        <p class="text-[10px] text-[#7A685B] mb-2">Ngân hàng MB Bank</p>
                         <button type="button" onclick="copyBankNumber('0969762425', 'Nguyễn Quốc Huy')"
-                            class="px-3 py-1 rounded-full bg-[#EDE2D3] hover:bg-[#6E5A4F] hover:text-white text-[#4E3D34] text-[10px] font-medium transition cursor-pointer flex items-center gap-1">
+                            class="w-full py-1.5 px-2 rounded-full bg-[#EDE2D3] hover:bg-[#6E5A4F] hover:text-white text-[#4E3D34] text-[10px] font-medium transition cursor-pointer flex items-center justify-center gap-1">
                             <i class="fa-regular fa-copy"></i> Sao chép STK
                         </button>
                     </div>
 
                     <!-- QR Cô Dâu -->
-                    <div class="bg-white p-3.5 rounded-xl border border-[#DED0BD] shadow-xs flex flex-col items-center">
-                        <p class="text-[11px] font-bold uppercase tracking-wider text-[#4E3D34] mb-2">Cô Dâu: Hồng Ngọc
-                        </p>
-                        <div
-                            class="w-full max-w-[175px] rounded-lg overflow-hidden border border-[#EDE2D3] bg-white flex items-center justify-center p-1 mb-2">
-                            <img src="image2/qr-co-dau.png" alt="QR Cô Dâu Nguyễn Hồng Ngọc"
-                                class="w-full h-auto object-contain">
+                    <div
+                        class="bg-white p-2 sm:p-3.5 rounded-xl border border-[#DED0BD] shadow-xs flex flex-col items-center justify-between">
+                        <div class="w-full flex flex-col items-center">
+                            <p
+                                class="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider text-[#4E3D34] mb-1.5">
+                                Cô Dâu: Hồng Ngọc
+                            </p>
+                            <div
+                                class="w-full aspect-square max-w-[162px] sm:max-w-[175px] rounded-lg overflow-hidden border border-[#EDE2D3] bg-white flex items-center justify-center p-0.5 mb-1.5">
+                                <img src="image2/qr-co-dau.png" alt="QR Cô Dâu Nguyễn Hồng Ngọc"
+                                    class="w-full h-full object-contain">
+                            </div>
+                            <p class="text-[10px] sm:text-[11px] font-bold text-[#4E3D34] uppercase leading-tight">
+                                NGUYEN HONG NGOC</p>
+                            <p class="text-[11.5px] sm:text-xs font-bold text-[#6E5A4F] tracking-wide my-0.5">1029609658
+                            </p>
+                            <p class="text-[9.5px] sm:text-[10px] text-[#7A685B] mb-2">Vietcombank</p>
                         </div>
-                        <p class="text-[11px] font-bold text-[#4E3D34] uppercase">NGUYEN HONG NGOC</p>
-                        <p class="text-xs font-bold text-[#6E5A4F] tracking-wide my-0.5">1029609658</p>
-                        <p class="text-[10px] text-[#7A685B] mb-2">Vietcombank - PGD Hiệp Hòa</p>
                         <button type="button" onclick="copyBankNumber('1029609658', 'Nguyễn Hồng Ngọc')"
-                            class="px-3 py-1 rounded-full bg-[#EDE2D3] hover:bg-[#6E5A4F] hover:text-white text-[#4E3D34] text-[10px] font-medium transition cursor-pointer flex items-center gap-1">
+                            class="w-full py-1.5 px-2 rounded-full bg-[#EDE2D3] hover:bg-[#6E5A4F] hover:text-white text-[#4E3D34] text-[10px] font-medium transition cursor-pointer flex items-center justify-center gap-1">
                             <i class="fa-regular fa-copy"></i> Sao chép STK
                         </button>
                     </div>
@@ -1527,7 +1810,7 @@
             }
         }
 
-        /* ---------------- 4. OPENING INVITATION CARD EFFECT ---------------- */
+        /* ---------------- 4. OPENING INVITATION CARD EFFECT (SHAKE TO OPEN + CLICK TO OPEN) ---------------- */
         let isEnvelopeOpening = false;
 
         function openWeddingInvitation() {
@@ -1538,11 +1821,6 @@
             const body = document.getElementById('page-body');
             const heroHeader = document.getElementById('hero-header');
 
-            overlay.classList.add('card-opened');
-
-            // Burst celebration petals from the center of the card when opening
-            burstCelebrationPetals();
-
             if (!musicPlaying) {
                 const audio = document.getElementById('bg-music');
                 const icon = document.getElementById('music-icon');
@@ -1552,12 +1830,24 @@
                 }).catch(() => { });
             }
 
+            // Bước 1: Hiệu ứng lắc phong bì (0.48s)
+            overlay.classList.add('envelope-shaking');
+
+            // Bước 2: Sau khi lắc xong thì mở nắp phong bì 3D, rút thiệp lên và tung cánh hoa
+            setTimeout(() => {
+                overlay.classList.remove('envelope-shaking');
+                overlay.classList.add('card-opened');
+                burstCelebrationPetals();
+            }, 480);
+
+            // Bước 3: Chờ khách nhìn rõ hoa bung nở & thiệp trượt lên rồi chuyển mượt vào trang chính
             setTimeout(() => {
                 overlay.classList.add('overlay-hidden');
                 body.classList.remove('overflow-hidden');
                 if (heroHeader) heroHeader.classList.add('hero-visible');
                 triggerScrollReveal();
-            }, 680);
+                startIdleAutoScrollSystem();
+            }, 2600);
         }
 
         function replayEnvelope() {
@@ -1566,26 +1856,195 @@
             const heroHeader = document.getElementById('hero-header');
 
             isEnvelopeOpening = false;
-            overlay.classList.remove('card-opened', 'overlay-hidden');
+            stopIdleAutoScrollSystem();
+            overlay.classList.remove('envelope-shaking', 'card-opened', 'overlay-hidden');
             if (heroHeader) heroHeader.classList.remove('hero-visible');
             body.classList.add('overflow-hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        /* ---------------- 5. SCROLL REVEAL ---------------- */
+        // Tích hợp cảm biến Lắc điện thoại (DeviceMotion Shake) & Lắc chuột nhanh để mở phong bì
+        (function initShakeToOpen() {
+            let lastAcc = { x: null, y: null, z: null };
+            let lastTime = 0;
+            const SHAKE_THRESHOLD = 13; // Độ nhạy khi lắc điện thoại
+
+            function onDeviceMotion(e) {
+                if (isEnvelopeOpening) return;
+                const acc = e.accelerationIncludingGravity || e.acceleration;
+                if (!acc || acc.x === null) return;
+
+                const now = Date.now();
+                if (now - lastTime < 120) return;
+
+                if (lastAcc.x !== null) {
+                    const deltaX = Math.abs(acc.x - lastAcc.x);
+                    const deltaY = Math.abs(acc.y - lastAcc.y);
+                    const deltaZ = Math.abs(acc.z - lastAcc.z);
+                    if ((deltaX + deltaY + deltaZ) > SHAKE_THRESHOLD) {
+                        openWeddingInvitation();
+                    }
+                }
+                lastAcc = { x: acc.x, y: acc.y, z: acc.z };
+                lastTime = now;
+            }
+
+            if (window.DeviceMotionEvent) {
+                window.addEventListener('devicemotion', onDeviceMotion, false);
+                // Hỗ trợ cấp quyền cảm biến trên iOS 13+
+                window.addEventListener('touchstart', function requestIosMotion() {
+                    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                        DeviceMotionEvent.requestPermission().then(state => {
+                            if (state === 'granted') {
+                                window.addEventListener('devicemotion', onDeviceMotion, false);
+                            }
+                        }).catch(() => { });
+                    }
+                }, { once: true });
+            }
+
+            // Hỗ trợ lắc chuột qua lại nhanh trên máy tính để mở phong bì
+            let lastMouseX = null;
+            let directionChanges = 0;
+            let lastDir = 0;
+            let mouseShakeTimer = null;
+
+            window.addEventListener('mousemove', (e) => {
+                if (isEnvelopeOpening) return;
+                if (lastMouseX !== null) {
+                    const dx = e.clientX - lastMouseX;
+                    if (Math.abs(dx) > 22) {
+                        const dir = Math.sign(dx);
+                        if (dir !== lastDir && lastDir !== 0) {
+                            directionChanges++;
+                            clearTimeout(mouseShakeTimer);
+                            mouseShakeTimer = setTimeout(() => { directionChanges = 0; }, 500);
+                            if (directionChanges >= 4) {
+                                directionChanges = 0;
+                                openWeddingInvitation();
+                            }
+                        }
+                        lastDir = dir;
+                    }
+                }
+                lastMouseX = e.clientX;
+            });
+        })();
+
+        /* ---------------- 5. SCROLL REVEAL (HIỆU ỨNG HIỆN DẦN TỪNG DÒNG CHỮ KHI CUỘN XUỐNG) & TỰ ĐỘNG LƯỚT CHẬM KHI KHÔNG CHẠM ---------------- */
+        let scrollRevealInitialized = false;
+
         function triggerScrollReveal() {
+            // Tự động gắn class hiệu ứng hiện dần cho tất cả các tiêu đề, đoạn chữ, thẻ thông tin và mục lịch trình bên trong các section
             const sections = document.querySelectorAll('.reveal-section');
-            const observer = new IntersectionObserver((entries) => {
+            sections.forEach(sec => {
+                const textElements = sec.querySelectorAll('h2, h3, p, .grid > div, form, #wishes-list > div, footer');
+                textElements.forEach((el, idx) => {
+                    if (!el.classList.contains('scroll-text-reveal')) {
+                        el.classList.add('scroll-text-reveal');
+                        // Tạo độ trễ nối tiếp nhẹ giữa các dòng trong cùng 1 khung để chữ hiện ra tuần tự mượt mà
+                        el.style.transitionDelay = `${Math.min((idx % 6) * 95, 480)}ms`;
+                    }
+                });
+            });
+
+            const sectionObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('revealed');
                     }
                 });
-            }, { threshold: 0.12 });
+            }, { threshold: 0.1 });
 
-            sections.forEach(sec => observer.observe(sec));
+            sections.forEach(sec => sectionObserver.observe(sec));
+
+            const textObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.15, rootMargin: "0px 0px -35px 0px" });
+
+            document.querySelectorAll('.scroll-text-reveal').forEach(el => textObserver.observe(el));
+            scrollRevealInitialized = true;
         }
         window.addEventListener('DOMContentLoaded', triggerScrollReveal);
+
+        // Hệ thống tự động lướt chậm (Auto-Scroll) khi người dùng không chạm màn hình
+        let autoScrollRafId = null;
+        let idleResumeTimeout = null;
+        let isUserInteracting = false;
+        let isAutoScrollEnabled = false;
+        let fractionalScrollY = 0;
+        const AUTO_SCROLL_SPEED = 0.55; // Tốc độ lướt chậm mượt mà (~33px/giây ở 60fps)
+        const IDLE_WAIT_MS = 2600;      // Chờ 2.6 giây sau khi ngừng chạm sẽ tiếp tục tự lướt
+
+        function isTypingInForm() {
+            const active = document.activeElement;
+            if (!active) return false;
+            const tag = active.tagName.toLowerCase();
+            return tag === 'input' || tag === 'textarea' || tag === 'select';
+        }
+
+        function isModalOpen() {
+            const giftModal = document.getElementById('gift-modal');
+            return giftModal && !giftModal.classList.contains('hidden');
+        }
+
+        function stepAutoScroll() {
+            if (!isAutoScrollEnabled) return;
+
+            if (!isUserInteracting && !isTypingInForm() && !isModalOpen()) {
+                const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                if (window.scrollY < maxScroll - 2) {
+                    fractionalScrollY += AUTO_SCROLL_SPEED;
+                    if (fractionalScrollY >= 1) {
+                        const step = Math.floor(fractionalScrollY);
+                        window.scrollBy(0, step);
+                        fractionalScrollY -= step;
+                    }
+                }
+            }
+            autoScrollRafId = requestAnimationFrame(stepAutoScroll);
+        }
+
+        function pauseAutoScrollOnInteraction() {
+            if (!isAutoScrollEnabled) return;
+            isUserInteracting = true;
+            fractionalScrollY = 0;
+            if (idleResumeTimeout) clearTimeout(idleResumeTimeout);
+            idleResumeTimeout = setTimeout(() => {
+                isUserInteracting = false;
+            }, IDLE_WAIT_MS);
+        }
+
+        function startIdleAutoScrollSystem() {
+            if (isAutoScrollEnabled) return;
+            isAutoScrollEnabled = true;
+            isUserInteracting = true;
+
+            // Khi vừa mở thiệp, đợi 2.2 giây cho khách ngắm ảnh đầu trang rồi bắt đầu lướt chậm xuống
+            if (idleResumeTimeout) clearTimeout(idleResumeTimeout);
+            idleResumeTimeout = setTimeout(() => {
+                isUserInteracting = false;
+            }, 2200);
+
+            window.addEventListener('touchstart', pauseAutoScrollOnInteraction, { passive: true });
+            window.addEventListener('touchmove', pauseAutoScrollOnInteraction, { passive: true });
+            window.addEventListener('wheel', pauseAutoScrollOnInteraction, { passive: true });
+            window.addEventListener('mousedown', pauseAutoScrollOnInteraction, { passive: true });
+            window.addEventListener('keydown', pauseAutoScrollOnInteraction, { passive: true });
+
+            if (autoScrollRafId) cancelAnimationFrame(autoScrollRafId);
+            autoScrollRafId = requestAnimationFrame(stepAutoScroll);
+        }
+
+        function stopIdleAutoScrollSystem() {
+            isAutoScrollEnabled = false;
+            if (idleResumeTimeout) clearTimeout(idleResumeTimeout);
+            if (autoScrollRafId) cancelAnimationFrame(autoScrollRafId);
+        }
 
         /* ---------------- 6. FALLING PETALS CANVAS (FROM Hieuunghoaroi.png) ---------------- */
         const canvas = document.getElementById('petals-canvas');
@@ -1734,6 +2193,122 @@
                 showToast("Đã tạm dừng hiệu ứng cánh hoa rơi");
             }
         }
+
+        /* ---------------- 7. HIỆU ỨNG CHẠM MÀN HÌNH NỞ TRÁI TIM HỒNG & ĐỐM SÁNG (GIỐNG MẪU) ---------------- */
+        (function initTouchHeartsEffect() {
+            const heartPalettes = [
+                { id: 'hg1', c1: '#FFD5DC', c2: '#FF4F79' }, // Hồng đào chuyển đỏ hồng đậm
+                { id: 'hg2', c1: '#FFE3E8', c2: '#FF7A9A' }, // Hồng phấn mềm mại
+                { id: 'hg3', c1: '#FFC2CE', c2: '#F83B68' }, // Hồng san hô rực rỡ
+                { id: 'hg4', c1: '#FFEBF0', c2: '#FFA6BE' }  // Hồng pastel trong trẻo
+            ];
+
+            function createHeartSvg(size, paletteIndex, blurGlow) {
+                const p = heartPalettes[paletteIndex % heartPalettes.length];
+                const uid = p.id + '_' + Math.random().toString(36).slice(2, 7);
+                return `
+                    <svg width="${size}" height="${size}" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 3px 8px rgba(255, 92, 132, ${blurGlow}));">
+                        <defs>
+                            <linearGradient id="${uid}" x1="4" y1="6" x2="32" y2="30" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="${p.c1}" />
+                                <stop offset="100%" stop-color="${p.c2}" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M18 31.5C18 31.5 4.5 22.8 4.5 12.75C4.5 8.1 8.1 4.5 12.6 4.5C15.3 4.5 17.1 5.85 18 7.65C18.9 5.85 20.7 4.5 23.4 4.5C27.9 4.5 31.5 8.1 31.5 12.75C31.5 22.8 18 31.5 18 31.5Z" fill="url(#${uid})" />
+                    </svg>
+                `;
+            }
+
+            function spawnTouchHearts(clientX, clientY) {
+                // 1. Tạo chùm 4 - 6 trái tim hồng lớn nhỏ bay lên với góc nghiêng & độ trong suốt khác nhau
+                const heartCount = 5;
+                for (let i = 0; i < heartCount; i++) {
+                    const el = document.createElement('div');
+                    el.className = 'touch-heart-particle';
+
+                    // Trái tim đầu tiên to rõ, các trái tim phụ xung quanh nhỏ và mờ ảo như mẫu
+                    const size = i === 0 ? (Math.random() * 10 + 26) : (Math.random() * 14 + 13);
+                    const offsetX = (Math.random() - 0.5) * 32;
+                    const offsetY = (Math.random() - 0.5) * 24;
+                    const tx = (Math.random() - 0.5) * 78;
+                    const ty = -(Math.random() * 65 + 48);
+                    const rotStart = (Math.random() - 0.5) * 30;
+                    const rotMid = (Math.random() - 0.5) * 36;
+                    const rotEnd = (Math.random() - 0.5) * 45;
+                    const dur = (Math.random() * 0.45 + 0.95).toFixed(2) + 's';
+                    const maxOp = i === 0 ? 0.94 : (Math.random() * 0.35 + 0.52).toFixed(2);
+                    const endScale = (Math.random() * 0.35 + 0.65).toFixed(2);
+
+                    el.style.left = (clientX + offsetX) + 'px';
+                    el.style.top = (clientY + offsetY) + 'px';
+                    el.style.setProperty('--tx', `${tx}px`);
+                    el.style.setProperty('--ty', `${ty}px`);
+                    el.style.setProperty('--rot-start', `${rotStart}deg`);
+                    el.style.setProperty('--rot-mid', `${rotMid}deg`);
+                    el.style.setProperty('--rot-end', `${rotEnd}deg`);
+                    el.style.setProperty('--dur', dur);
+                    el.style.setProperty('--max-op', maxOp);
+                    el.style.setProperty('--end-scale', endScale);
+
+                    el.innerHTML = createHeartSvg(size, i, i === 0 ? 0.38 : 0.22);
+                    document.body.appendChild(el);
+
+                    setTimeout(() => el.remove(), 1450);
+                }
+
+                // 2. Tạo thêm các hạt đốm hồng lấp lánh (sparkle bokeh dots) tỏa tròn xung quanh như trong ảnh mẫu
+                const dotCount = 7;
+                for (let j = 0; j < dotCount; j++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'touch-sparkle-dot';
+                    const dSize = Math.random() * 5 + 3;
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = Math.random() * 44 + 14;
+                    const dx = Math.cos(angle) * dist;
+                    const dy = Math.sin(angle) * dist - 18;
+                    const dur = (Math.random() * 0.35 + 0.7).toFixed(2) + 's';
+
+                    dot.style.width = `${dSize}px`;
+                    dot.style.height = `${dSize}px`;
+                    dot.style.left = `${clientX}px`;
+                    dot.style.top = `${clientY}px`;
+                    dot.style.background = j % 2 === 0
+                        ? 'radial-gradient(circle, #FF6B8E 0%, #FFB5C5 100%)'
+                        : 'radial-gradient(circle, #FF8DA8 0%, #FFD6E0 100%)';
+                    dot.style.boxShadow = '0 0 6px rgba(255, 105, 140, 0.45)';
+                    dot.style.setProperty('--dx', `${dx}px`);
+                    dot.style.setProperty('--dy', `${dy}px`);
+                    dot.style.setProperty('--dur', dur);
+
+                    document.body.appendChild(dot);
+                    setTimeout(() => dot.remove(), 1100);
+                }
+            }
+
+            let lastTouchTime = 0;
+            let lastMoveTime = 0;
+
+            window.addEventListener('touchstart', (e) => {
+                lastTouchTime = Date.now();
+                if (e.touches && e.touches.length > 0) {
+                    spawnTouchHearts(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: true });
+
+            window.addEventListener('touchmove', (e) => {
+                const now = Date.now();
+                if (now - lastMoveTime > 140 && e.touches && e.touches.length > 0) {
+                    lastMoveTime = now;
+                    spawnTouchHearts(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: true });
+
+            window.addEventListener('click', (e) => {
+                // Tránh tạo trùng 2 lần trên điện thoại khi vừa touchstart vừa click
+                if (Date.now() - lastTouchTime < 450) return;
+                spawnTouchHearts(e.clientX, e.clientY);
+            }, { passive: true });
+        })();
     </script>
 </body>
 
