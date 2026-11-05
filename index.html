@@ -1846,7 +1846,7 @@
                 body.classList.remove('overflow-hidden');
                 if (heroHeader) heroHeader.classList.add('hero-visible');
                 triggerScrollReveal();
-                startIdleAutoScrollSystem();
+                startAutoScrollSystem();
             }, 2600);
         }
 
@@ -1856,54 +1856,115 @@
             const heroHeader = document.getElementById('hero-header');
 
             isEnvelopeOpening = false;
-            stopIdleAutoScrollSystem();
+            stopAutoScrollSystem();
             overlay.classList.remove('envelope-shaking', 'card-opened', 'overlay-hidden');
             if (heroHeader) heroHeader.classList.remove('hero-visible');
             body.classList.add('overflow-hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Tích hợp cảm biến Lắc điện thoại (DeviceMotion Shake) & Lắc chuột nhanh để mở phong bì
+        // Tích hợp cảm biến Lắc điện thoại (Kết hợp gia tốc DeviceMotion & con quay DeviceOrientation siêu nhạy) & Lắc chuột trên PC
         (function initShakeToOpen() {
             let lastAcc = { x: null, y: null, z: null };
-            let lastTime = 0;
-            const SHAKE_THRESHOLD = 13; // Độ nhạy khi lắc điện thoại
+            let lastMotionTime = 0;
+            const SHAKE_MOTION_THRESHOLD = 6.5; // Ngưỡng gia tốc nhạy, lắc nhẹ hoặc vừa là kích hoạt
 
+            let lastGamma = null;
+            let lastBeta = null;
+            let lastOrientTime = 0;
+            const SHAKE_ORIENT_THRESHOLD = 26; // Ngưỡng xoay/vẩy cổ tay qua lại (độ)
+
+            function triggerOpenByShake() {
+                if (isEnvelopeOpening) return;
+                openWeddingInvitation();
+            }
+
+            // 1. Nhận diện chuyển động lắc qua cảm biến gia tốc (DeviceMotionEvent)
             function onDeviceMotion(e) {
                 if (isEnvelopeOpening) return;
                 const acc = e.accelerationIncludingGravity || e.acceleration;
-                if (!acc || acc.x === null) return;
+                if (!acc) return;
+
+                const x = acc.x != null ? acc.x : 0;
+                const y = acc.y != null ? acc.y : 0;
+                const z = acc.z != null ? acc.z : 0;
 
                 const now = Date.now();
-                if (now - lastTime < 120) return;
+                if (now - lastMotionTime < 65) return;
 
                 if (lastAcc.x !== null) {
-                    const deltaX = Math.abs(acc.x - lastAcc.x);
-                    const deltaY = Math.abs(acc.y - lastAcc.y);
-                    const deltaZ = Math.abs(acc.z - lastAcc.z);
-                    if ((deltaX + deltaY + deltaZ) > SHAKE_THRESHOLD) {
-                        openWeddingInvitation();
+                    const deltaX = Math.abs(x - lastAcc.x);
+                    const deltaY = Math.abs(y - lastAcc.y);
+                    const deltaZ = Math.abs(z - lastAcc.z);
+                    const totalDelta = deltaX + deltaY + deltaZ;
+
+                    if (totalDelta > SHAKE_MOTION_THRESHOLD) {
+                        triggerOpenByShake();
+                        return;
                     }
                 }
-                lastAcc = { x: acc.x, y: acc.y, z: acc.z };
-                lastTime = now;
+                lastAcc = { x, y, z };
+                lastMotionTime = now;
             }
 
-            if (window.DeviceMotionEvent) {
-                window.addEventListener('devicemotion', onDeviceMotion, false);
-                // Hỗ trợ cấp quyền cảm biến trên iOS 13+
-                window.addEventListener('touchstart', function requestIosMotion() {
-                    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+            // 2. Nhận diện chuyển động xoay/vẩy cổ tay qua cảm biến con quay (DeviceOrientationEvent)
+            function onDeviceOrientation(e) {
+                if (isEnvelopeOpening) return;
+                const gamma = e.gamma; // Góc nghiêng trái - phải [-90, 90]
+                const beta = e.beta;   // Góc nghiêng trước - sau [-180, 180]
+                if (gamma == null || beta == null) return;
+
+                const now = Date.now();
+                if (now - lastOrientTime < 65) return;
+
+                if (lastGamma !== null && lastBeta !== null) {
+                    const deltaGamma = Math.abs(gamma - lastGamma);
+                    const deltaBeta = Math.abs(beta - lastBeta);
+                    // Khi người dùng cầm điện thoại vẩy cổ tay qua lại, góc nghiêng thay đổi rất lớn và nhanh
+                    if ((deltaGamma + deltaBeta) > SHAKE_ORIENT_THRESHOLD) {
+                        triggerOpenByShake();
+                        return;
+                    }
+                }
+                lastGamma = gamma;
+                lastBeta = beta;
+                lastOrientTime = now;
+            }
+
+            // Đăng ký ngay cho Android và các trình duyệt không cần cấp quyền trước
+            try {
+                if (window.DeviceMotionEvent) {
+                    window.addEventListener('devicemotion', onDeviceMotion, { passive: true });
+                }
+                if (window.DeviceOrientationEvent) {
+                    window.addEventListener('deviceorientation', onDeviceOrientation, { passive: true });
+                }
+            } catch (err) { }
+
+            // Hỗ trợ xin cấp quyền cảm biến trên iOS 13+ (Safari yêu cầu gọi trong cử chỉ chạm)
+            function requestIosSensorPermissions() {
+                try {
+                    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
                         DeviceMotionEvent.requestPermission().then(state => {
                             if (state === 'granted') {
-                                window.addEventListener('devicemotion', onDeviceMotion, false);
+                                window.addEventListener('devicemotion', onDeviceMotion, { passive: true });
                             }
                         }).catch(() => { });
                     }
-                }, { once: true });
+                    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                        DeviceOrientationEvent.requestPermission().then(state => {
+                            if (state === 'granted') {
+                                window.addEventListener('deviceorientation', onDeviceOrientation, { passive: true });
+                            }
+                        }).catch(() => { });
+                    }
+                } catch (err) { }
             }
 
-            // Hỗ trợ lắc chuột qua lại nhanh trên máy tính để mở phong bì
+            window.addEventListener('touchstart', requestIosSensorPermissions, { once: true, passive: true });
+            window.addEventListener('click', requestIosSensorPermissions, { once: true, passive: true });
+
+            // 3. Hỗ trợ lắc chuột qua lại nhanh trên máy tính để mở phong bì
             let lastMouseX = null;
             let directionChanges = 0;
             let lastDir = 0;
@@ -1913,25 +1974,25 @@
                 if (isEnvelopeOpening) return;
                 if (lastMouseX !== null) {
                     const dx = e.clientX - lastMouseX;
-                    if (Math.abs(dx) > 22) {
+                    if (Math.abs(dx) > 18) {
                         const dir = Math.sign(dx);
                         if (dir !== lastDir && lastDir !== 0) {
                             directionChanges++;
                             clearTimeout(mouseShakeTimer);
                             mouseShakeTimer = setTimeout(() => { directionChanges = 0; }, 500);
-                            if (directionChanges >= 4) {
+                            if (directionChanges >= 3) {
                                 directionChanges = 0;
-                                openWeddingInvitation();
+                                triggerOpenByShake();
                             }
                         }
                         lastDir = dir;
                     }
                 }
                 lastMouseX = e.clientX;
-            });
+            }, { passive: true });
         })();
 
-        /* ---------------- 5. SCROLL REVEAL (HIỆU ỨNG HIỆN DẦN TỪNG DÒNG CHỮ KHI CUỘN XUỐNG) & TỰ ĐỘNG LƯỚT CHẬM KHI KHÔNG CHẠM ---------------- */
+        /* ---------------- 5. SCROLL REVEAL & HỆ THỐNG TỰ ĐỘNG TRƯỢT TỪ TỪ XUỐNG (DỪNG KHI CHẠM TAY) ---------------- */
         let scrollRevealInitialized = false;
 
         function triggerScrollReveal() {
@@ -1971,80 +2032,77 @@
         }
         window.addEventListener('DOMContentLoaded', triggerScrollReveal);
 
-        // Hệ thống tự động lướt chậm (Auto-Scroll) khi người dùng không chạm màn hình
+        // Hệ thống tự động trượt chậm từ từ xuống khi vừa mở thiệp và DỪNG HẲN khi người dùng chạm tay vào màn hình
         let autoScrollRafId = null;
-        let idleResumeTimeout = null;
-        let isUserInteracting = false;
-        let isAutoScrollEnabled = false;
+        let isAutoScrolling = false;
+        let autoScrollStartTimer = null;
         let fractionalScrollY = 0;
-        const AUTO_SCROLL_SPEED = 0.55; // Tốc độ lướt chậm mượt mà (~33px/giây ở 60fps)
-        const IDLE_WAIT_MS = 2600;      // Chờ 2.6 giây sau khi ngừng chạm sẽ tiếp tục tự lướt
-
-        function isTypingInForm() {
-            const active = document.activeElement;
-            if (!active) return false;
-            const tag = active.tagName.toLowerCase();
-            return tag === 'input' || tag === 'textarea' || tag === 'select';
-        }
-
-        function isModalOpen() {
-            const giftModal = document.getElementById('gift-modal');
-            return giftModal && !giftModal.classList.contains('hidden');
-        }
+        const AUTO_SCROLL_SPEED = 0.95; // Tốc độ trượt từ từ êm dịu (~55-60px/giây)
 
         function stepAutoScroll() {
-            if (!isAutoScrollEnabled) return;
+            if (!isAutoScrolling) return;
 
-            if (!isUserInteracting && !isTypingInForm() && !isModalOpen()) {
-                const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-                if (window.scrollY < maxScroll - 2) {
-                    fractionalScrollY += AUTO_SCROLL_SPEED;
-                    if (fractionalScrollY >= 1) {
-                        const step = Math.floor(fractionalScrollY);
-                        window.scrollBy(0, step);
-                        fractionalScrollY -= step;
-                    }
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            if (window.scrollY < maxScroll - 2) {
+                fractionalScrollY += AUTO_SCROLL_SPEED;
+                if (fractionalScrollY >= 1) {
+                    const step = Math.floor(fractionalScrollY);
+                    window.scrollBy(0, step);
+                    fractionalScrollY -= step;
                 }
+                autoScrollRafId = requestAnimationFrame(stepAutoScroll);
+            } else {
+                stopAutoScrollSystem();
             }
-            autoScrollRafId = requestAnimationFrame(stepAutoScroll);
         }
 
-        function pauseAutoScrollOnInteraction() {
-            if (!isAutoScrollEnabled) return;
-            isUserInteracting = true;
+        // Bất kỳ thao tác chạm tay, vuốt, lăn chuột hoặc bấm phím nào của người dùng sẽ DỪNG TỰ TRƯỢT NGAY LẬP TỨC
+        function handleUserTouchStopScroll() {
+            stopAutoScrollSystem();
+        }
+
+        function startAutoScrollSystem() {
+            // Dọn dẹp phiên trượt trước (nếu có)
+            stopAutoScrollSystem();
             fractionalScrollY = 0;
-            if (idleResumeTimeout) clearTimeout(idleResumeTimeout);
-            idleResumeTimeout = setTimeout(() => {
-                isUserInteracting = false;
-            }, IDLE_WAIT_MS);
+
+            // Chờ 500ms sau khi thiệp mở xong và trang chính lộ rõ hoàn toàn để bắt đầu trượt từ từ xuống
+            autoScrollStartTimer = setTimeout(() => {
+                isAutoScrolling = true;
+                autoScrollRafId = requestAnimationFrame(stepAutoScroll);
+            }, 500);
+
+            // Đăng ký sự kiện: CHỈ CẦN CHẠM TAY VÀO MÀN HÌNH HOẶC TƯƠNG TÁC LÀ DỪNG NGAY
+            window.addEventListener('touchstart', handleUserTouchStopScroll, { passive: true });
+            window.addEventListener('touchmove', handleUserTouchStopScroll, { passive: true });
+            window.addEventListener('pointerdown', handleUserTouchStopScroll, { passive: true });
+            window.addEventListener('mousedown', handleUserTouchStopScroll, { passive: true });
+            window.addEventListener('wheel', handleUserTouchStopScroll, { passive: true });
+            window.addEventListener('keydown', handleUserTouchStopScroll, { passive: true });
         }
 
-        function startIdleAutoScrollSystem() {
-            if (isAutoScrollEnabled) return;
-            isAutoScrollEnabled = true;
-            isUserInteracting = true;
-
-            // Khi vừa mở thiệp, đợi 2.2 giây cho khách ngắm ảnh đầu trang rồi bắt đầu lướt chậm xuống
-            if (idleResumeTimeout) clearTimeout(idleResumeTimeout);
-            idleResumeTimeout = setTimeout(() => {
-                isUserInteracting = false;
-            }, 2200);
-
-            window.addEventListener('touchstart', pauseAutoScrollOnInteraction, { passive: true });
-            window.addEventListener('touchmove', pauseAutoScrollOnInteraction, { passive: true });
-            window.addEventListener('wheel', pauseAutoScrollOnInteraction, { passive: true });
-            window.addEventListener('mousedown', pauseAutoScrollOnInteraction, { passive: true });
-            window.addEventListener('keydown', pauseAutoScrollOnInteraction, { passive: true });
-
-            if (autoScrollRafId) cancelAnimationFrame(autoScrollRafId);
-            autoScrollRafId = requestAnimationFrame(stepAutoScroll);
+        function stopAutoScrollSystem() {
+            isAutoScrolling = false;
+            if (autoScrollStartTimer) {
+                clearTimeout(autoScrollStartTimer);
+                autoScrollStartTimer = null;
+            }
+            if (autoScrollRafId) {
+                cancelAnimationFrame(autoScrollRafId);
+                autoScrollRafId = null;
+            }
+            // Gỡ bỏ listener sau khi đã dừng
+            window.removeEventListener('touchstart', handleUserTouchStopScroll);
+            window.removeEventListener('touchmove', handleUserTouchStopScroll);
+            window.removeEventListener('pointerdown', handleUserTouchStopScroll);
+            window.removeEventListener('mousedown', handleUserTouchStopScroll);
+            window.removeEventListener('wheel', handleUserTouchStopScroll);
+            window.removeEventListener('keydown', handleUserTouchStopScroll);
         }
 
-        function stopIdleAutoScrollSystem() {
-            isAutoScrollEnabled = false;
-            if (idleResumeTimeout) clearTimeout(idleResumeTimeout);
-            if (autoScrollRafId) cancelAnimationFrame(autoScrollRafId);
-        }
+        // Tương thích ngược với các tên gọi cũ (nếu có)
+        function startIdleAutoScrollSystem() { startAutoScrollSystem(); }
+        function stopIdleAutoScrollSystem() { stopAutoScrollSystem(); }
 
         /* ---------------- 6. FALLING PETALS CANVAS (FROM Hieuunghoaroi.png) ---------------- */
         const canvas = document.getElementById('petals-canvas');
