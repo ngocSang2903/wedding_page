@@ -2032,17 +2032,29 @@
         }
         window.addEventListener('DOMContentLoaded', triggerScrollReveal);
 
-        // Hệ thống tự động trượt chậm từ từ xuống khi vừa mở thiệp và DỪNG HẲN khi người dùng chạm tay vào màn hình
+        // Hệ thống tự động trượt chậm từ từ xuống khi vừa mở thiệp: GIỮ VÀO THÌ DỪNG, THẢ RA SẼ CUỘN TIẾP
         let autoScrollRafId = null;
         let isAutoScrolling = false;
+        let isHolding = false;
         let autoScrollStartTimer = null;
-        let enableTouchStopTimer = null;
-        let canTouchStop = false;
+        let resumeScrollTimer = null;
         let currentAutoScrollY = 0;
-        const AUTO_SCROLL_SPEED = 0.30; // Tốc độ trượt từ từ êm ái (~65-70px/giây, rất thư thái và mượt mà)
+        const AUTO_SCROLL_SPEED = 0.35; // Tốc độ trượt từ từ êm đềm, thư thái
+
+        function isModalOpen() {
+            const giftModal = document.getElementById('gift-modal');
+            return giftModal && !giftModal.classList.contains('hidden');
+        }
+
+        function isTypingInForm() {
+            const active = document.activeElement;
+            if (!active) return false;
+            const tag = active.tagName.toLowerCase();
+            return tag === 'input' || tag === 'textarea' || tag === 'select';
+        }
 
         function stepAutoScroll() {
-            if (!isAutoScrolling) return;
+            if (!isAutoScrolling || isHolding || isModalOpen() || isTypingInForm()) return;
 
             const scrollHeight = Math.max(
                 document.body.scrollHeight, document.documentElement.scrollHeight,
@@ -2070,67 +2082,116 @@
             autoScrollRafId = requestAnimationFrame(stepAutoScroll);
         }
 
-        // Bất kỳ thao tác chạm tay, vuốt màn hình, lăn chuột hoặc bấm phím nào khi đang tự cuộn sẽ DỪNG NGAY LẬP TỨC
-        function handleUserTouchStopScroll() {
-            if (!isAutoScrolling || !canTouchStop) return;
-            stopAutoScrollSystem();
+        // Bắt đầu hoặc tiếp tục tự động cuộn lại từ vị trí hiện tại
+        function resumeAutoScroll(delayMs = 250) {
+            if (!isAutoScrolling) return;
+            if (resumeScrollTimer) clearTimeout(resumeScrollTimer);
+
+            resumeScrollTimer = setTimeout(() => {
+                if (isHolding || isModalOpen() || isTypingInForm()) return;
+
+                // Tạm thời tắt smooth-scroll CSS để JS điều khiển 60fps mượt mà không bị giật lag
+                document.documentElement.classList.remove('scroll-smooth');
+                document.documentElement.style.scrollBehavior = 'auto';
+
+                // Đồng bộ tọa độ cuộn hiện tại mà người dùng đã thả tay
+                currentAutoScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+
+                if (autoScrollRafId) cancelAnimationFrame(autoScrollRafId);
+                autoScrollRafId = requestAnimationFrame(stepAutoScroll);
+            }, delayMs);
+        }
+
+        // TẠM DỪNG khi người dùng chạm ngón tay hoặc nhấn giữ chuột vào màn hình
+        function pauseAutoScrollOnHold() {
+            if (!isAutoScrolling) return;
+            isHolding = true;
+            if (resumeScrollTimer) clearTimeout(resumeScrollTimer);
+            if (autoScrollRafId) {
+                cancelAnimationFrame(autoScrollRafId);
+                autoScrollRafId = null;
+            }
+            // Cập nhật ngay tọa độ cuộn tại điểm người dùng vừa chạm giữ
+            currentAutoScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+        }
+
+        // TIẾP TỤC CUỘN khi người dùng buông ngón tay hoặc thả chuột ra
+        function resumeAutoScrollOnRelease() {
+            if (!isAutoScrolling) return;
+            isHolding = false;
+            // Cập nhật tọa độ hiện tại (kể cả khi người dùng vừa vuốt tay di chuyển đến đoạn khác)
+            currentAutoScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+            resumeAutoScroll(300); // Sau 300ms kể từ khi nhấc tay, tiếp tục trượt xuống êm ái
+        }
+
+        // Khi lăn chuột (wheel) trên máy tính
+        function handleWheelScroll() {
+            if (!isAutoScrolling) return;
+            pauseAutoScrollOnHold();
+            isHolding = false;
+            resumeAutoScroll(800); // 800ms sau khi dừng lăn chuột sẽ tiếp tục tự động cuộn
         }
 
         function startAutoScrollSystem() {
             stopAutoScrollSystem();
-            canTouchStop = false;
+            isAutoScrolling = true;
+            isHolding = false;
 
-            // QUAN TRỌNG: Tạm thời tắt class scroll-smooth của HTML để JS tự cuộn 60fps mượt mà,
-            // tránh bị CSS smooth-scroll của trình duyệt xung đột gây đứng im trang
+            // Tắt class scroll-smooth của HTML để JS tự cuộn 60fps mượt mà
             document.documentElement.classList.remove('scroll-smooth');
             document.documentElement.style.scrollBehavior = 'auto';
 
-            // Khởi tạo tọa độ xuất phát từ vị trí cuộn hiện tại
             currentAutoScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
 
             // Chờ 350ms sau khi thiệp mở xong và trang chính lộ rõ để bắt đầu trượt từ từ xuống
             autoScrollStartTimer = setTimeout(() => {
-                isAutoScrolling = true;
                 currentAutoScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+                if (autoScrollRafId) cancelAnimationFrame(autoScrollRafId);
                 autoScrollRafId = requestAnimationFrame(stepAutoScroll);
 
-                // Sau khi màn hình đã thực sự lăn bánh trôi xuống được 300ms (khách đã thấy trang chuyển động rõ ràng),
-                // mới kích hoạt nhận diện chạm tay để dừng lại (tránh ngón tay bấm mở thiệp lúc đầu làm tắt nhầm)
-                enableTouchStopTimer = setTimeout(() => {
-                    canTouchStop = true;
-                    window.addEventListener('touchstart', handleUserTouchStopScroll, { passive: true });
-                    window.addEventListener('touchmove', handleUserTouchStopScroll, { passive: true });
-                    window.addEventListener('pointerdown', handleUserTouchStopScroll, { passive: true });
-                    window.addEventListener('mousedown', handleUserTouchStopScroll, { passive: true });
-                    window.addEventListener('wheel', handleUserTouchStopScroll, { passive: true });
-                    window.addEventListener('keydown', handleUserTouchStopScroll, { passive: true });
-                }, 300);
+                // Lắng nghe sự kiện: GIỮ VÀO THÌ DỪNG, THẢ RA SẼ CUỘN TIẾP
+                window.addEventListener('touchstart', pauseAutoScrollOnHold, { passive: true });
+                window.addEventListener('pointerdown', pauseAutoScrollOnHold, { passive: true });
+                window.addEventListener('mousedown', pauseAutoScrollOnHold, { passive: true });
+
+                window.addEventListener('touchend', resumeAutoScrollOnRelease, { passive: true });
+                window.addEventListener('touchcancel', resumeAutoScrollOnRelease, { passive: true });
+                window.addEventListener('pointerup', resumeAutoScrollOnRelease, { passive: true });
+                window.addEventListener('pointercancel', resumeAutoScrollOnRelease, { passive: true });
+                window.addEventListener('mouseup', resumeAutoScrollOnRelease, { passive: true });
+
+                window.addEventListener('wheel', handleWheelScroll, { passive: true });
             }, 350);
         }
 
         function stopAutoScrollSystem() {
             isAutoScrolling = false;
-            canTouchStop = false;
+            isHolding = false;
             if (autoScrollStartTimer) {
                 clearTimeout(autoScrollStartTimer);
                 autoScrollStartTimer = null;
             }
-            if (enableTouchStopTimer) {
-                clearTimeout(enableTouchStopTimer);
-                enableTouchStopTimer = null;
+            if (resumeScrollTimer) {
+                clearTimeout(resumeScrollTimer);
+                resumeScrollTimer = null;
             }
             if (autoScrollRafId) {
                 cancelAnimationFrame(autoScrollRafId);
                 autoScrollRafId = null;
             }
 
-            // Gỡ bỏ listener sau khi đã dừng
-            window.removeEventListener('touchstart', handleUserTouchStopScroll);
-            window.removeEventListener('touchmove', handleUserTouchStopScroll);
-            window.removeEventListener('pointerdown', handleUserTouchStopScroll);
-            window.removeEventListener('mousedown', handleUserTouchStopScroll);
-            window.removeEventListener('wheel', handleUserTouchStopScroll);
-            window.removeEventListener('keydown', handleUserTouchStopScroll);
+            // Gỡ bỏ listener
+            window.removeEventListener('touchstart', pauseAutoScrollOnHold);
+            window.removeEventListener('pointerdown', pauseAutoScrollOnHold);
+            window.removeEventListener('mousedown', pauseAutoScrollOnHold);
+
+            window.removeEventListener('touchend', resumeAutoScrollOnRelease);
+            window.removeEventListener('touchcancel', resumeAutoScrollOnRelease);
+            window.removeEventListener('pointerup', resumeAutoScrollOnRelease);
+            window.removeEventListener('pointercancel', resumeAutoScrollOnRelease);
+            window.removeEventListener('mouseup', resumeAutoScrollOnRelease);
+
+            window.removeEventListener('wheel', handleWheelScroll);
 
             // Phục hồi lại class scroll-smooth của trang cho các tương tác thông thường
             document.documentElement.style.scrollBehavior = '';
