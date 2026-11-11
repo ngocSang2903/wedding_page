@@ -654,8 +654,8 @@
             <div class="relative z-20 mt-10">
                 <button type="button"
                     class="inline-flex items-center justify-center gap-2.5 px-8 py-2.5 rounded-full bg-[#8E1E22] text-[#FAF6F0] text-[11px] font-semibold uppercase tracking-[0.15em] shadow-md hover:bg-[#74161A] hover:scale-105 transition-all cursor-pointer">
-                    <i class="fa-solid fa-mobile-screen-button text-xs text-[#F1D7B4] animate-bounce"></i>
-                    <span>CHẠM HOẶC LẮC ĐỂ MỞ THIỆP</span>
+                    <i class="fa-solid fa-envelope-open-text text-xs text-[#F1D7B4] animate-bounce"></i>
+                    <span>CHẠM ĐỂ MỞ THIỆP</span>
                 </button>
                 <p class="font-serif italic text-[11px] text-[#7A685B] mt-3">
                     Trân trọng kính mời Quý khách
@@ -1882,135 +1882,6 @@
             body.classList.add('overflow-hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        // Tích hợp cảm biến Lắc điện thoại (Kết hợp gia tốc DeviceMotion & con quay DeviceOrientation siêu nhạy) & Lắc chuột trên PC
-        (function initShakeToOpen() {
-            let lastAcc = { x: null, y: null, z: null };
-            let lastMotionTime = 0;
-            const SHAKE_MOTION_THRESHOLD = 6.5; // Ngưỡng gia tốc nhạy, lắc nhẹ hoặc vừa là kích hoạt
-
-            let lastGamma = null;
-            let lastBeta = null;
-            let lastOrientTime = 0;
-            const SHAKE_ORIENT_THRESHOLD = 26; // Ngưỡng xoay/vẩy cổ tay qua lại (độ)
-
-            function triggerOpenByShake() {
-                if (isEnvelopeOpening) return;
-                openWeddingInvitation();
-            }
-
-            // 1. Nhận diện chuyển động lắc qua cảm biến gia tốc (DeviceMotionEvent)
-            function onDeviceMotion(e) {
-                if (isEnvelopeOpening) return;
-                const acc = e.accelerationIncludingGravity || e.acceleration;
-                if (!acc) return;
-
-                const x = acc.x != null ? acc.x : 0;
-                const y = acc.y != null ? acc.y : 0;
-                const z = acc.z != null ? acc.z : 0;
-
-                const now = Date.now();
-                if (now - lastMotionTime < 65) return;
-
-                if (lastAcc.x !== null) {
-                    const deltaX = Math.abs(x - lastAcc.x);
-                    const deltaY = Math.abs(y - lastAcc.y);
-                    const deltaZ = Math.abs(z - lastAcc.z);
-                    const totalDelta = deltaX + deltaY + deltaZ;
-
-                    if (totalDelta > SHAKE_MOTION_THRESHOLD) {
-                        triggerOpenByShake();
-                        return;
-                    }
-                }
-                lastAcc = { x, y, z };
-                lastMotionTime = now;
-            }
-
-            // 2. Nhận diện chuyển động xoay/vẩy cổ tay qua cảm biến con quay (DeviceOrientationEvent)
-            function onDeviceOrientation(e) {
-                if (isEnvelopeOpening) return;
-                const gamma = e.gamma; // Góc nghiêng trái - phải [-90, 90]
-                const beta = e.beta;   // Góc nghiêng trước - sau [-180, 180]
-                if (gamma == null || beta == null) return;
-
-                const now = Date.now();
-                if (now - lastOrientTime < 65) return;
-
-                if (lastGamma !== null && lastBeta !== null) {
-                    const deltaGamma = Math.abs(gamma - lastGamma);
-                    const deltaBeta = Math.abs(beta - lastBeta);
-                    // Khi người dùng cầm điện thoại vẩy cổ tay qua lại, góc nghiêng thay đổi rất lớn và nhanh
-                    if ((deltaGamma + deltaBeta) > SHAKE_ORIENT_THRESHOLD) {
-                        triggerOpenByShake();
-                        return;
-                    }
-                }
-                lastGamma = gamma;
-                lastBeta = beta;
-                lastOrientTime = now;
-            }
-
-            // Đăng ký ngay cho Android và các trình duyệt không cần cấp quyền trước
-            try {
-                if (window.DeviceMotionEvent) {
-                    window.addEventListener('devicemotion', onDeviceMotion, { passive: true });
-                }
-                if (window.DeviceOrientationEvent) {
-                    window.addEventListener('deviceorientation', onDeviceOrientation, { passive: true });
-                }
-            } catch (err) { }
-
-            // Hỗ trợ xin cấp quyền cảm biến trên iOS 13+ (Safari yêu cầu gọi trong cử chỉ chạm)
-            function requestIosSensorPermissions() {
-                try {
-                    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-                        DeviceMotionEvent.requestPermission().then(state => {
-                            if (state === 'granted') {
-                                window.addEventListener('devicemotion', onDeviceMotion, { passive: true });
-                            }
-                        }).catch(() => { });
-                    }
-                    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                        DeviceOrientationEvent.requestPermission().then(state => {
-                            if (state === 'granted') {
-                                window.addEventListener('deviceorientation', onDeviceOrientation, { passive: true });
-                            }
-                        }).catch(() => { });
-                    }
-                } catch (err) { }
-            }
-
-            window.addEventListener('touchstart', requestIosSensorPermissions, { once: true, passive: true });
-            window.addEventListener('click', requestIosSensorPermissions, { once: true, passive: true });
-
-            // 3. Hỗ trợ lắc chuột qua lại nhanh trên máy tính để mở phong bì
-            let lastMouseX = null;
-            let directionChanges = 0;
-            let lastDir = 0;
-            let mouseShakeTimer = null;
-
-            window.addEventListener('mousemove', (e) => {
-                if (isEnvelopeOpening) return;
-                if (lastMouseX !== null) {
-                    const dx = e.clientX - lastMouseX;
-                    if (Math.abs(dx) > 18) {
-                        const dir = Math.sign(dx);
-                        if (dir !== lastDir && lastDir !== 0) {
-                            directionChanges++;
-                            clearTimeout(mouseShakeTimer);
-                            mouseShakeTimer = setTimeout(() => { directionChanges = 0; }, 500);
-                            if (directionChanges >= 3) {
-                                directionChanges = 0;
-                                triggerOpenByShake();
-                            }
-                        }
-                        lastDir = dir;
-                    }
-                }
-                lastMouseX = e.clientX;
-            }, { passive: true });
-        })();
 
         /* ---------------- 5. SCROLL REVEAL (HIỆU ỨNG HIỆN DẦN KHI NGƯỜI DÙNG CUỘN XUỐNG) ---------------- */
         let scrollRevealInitialized = false;
