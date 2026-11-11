@@ -692,7 +692,7 @@
                         class="absolute -top-2 -right-2 w-16 h-auto z-20 pointer-events-none opacity-90" />
 
                     <div class="w-full h-[270px] overflow-hidden bg-stone-100">
-                        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=700&q=80"
+                        <img src="./image-wedding/center-image.jpg"
                             alt="Quốc Huy & Hồng Ngọc" class="w-full h-full object-cover">
                     </div>
                 </div>
@@ -1055,15 +1055,27 @@
                     DRESS CODE
                 </h2>
                 <p class="font-serif italic text-xs text-[#7A685B] mb-3">Trang phục dự tiệc</p>
-                <div class="flex items-center justify-center gap-3.5">
-                    <span class="w-7 h-7 rounded-full bg-[#1C2826] border border-white shadow-sm"
-                        title="Đen / Xanh than"></span>
-                    <span class="w-7 h-7 rounded-full bg-[#D8A45B] border border-white shadow-sm"
-                        title="Vàng đồng"></span>
-                    <span class="w-7 h-7 rounded-full bg-[#3A5A40] border border-white shadow-sm"
-                        title="Xanh rêu"></span>
-                    <span class="w-7 h-7 rounded-full bg-[#F3E5AB] border border-stone-300 shadow-sm"
-                        title="Kem / Be sáng"></span>
+                <div class="flex items-center justify-center gap-4 sm:gap-5">
+                    <div class="flex flex-col items-center gap-1.5">
+                        <span class="w-7 h-7 rounded-full bg-[#FFFFFF] border border-[#D8CCBD] shadow-xs"
+                            title="Trắng"></span>
+                        <span class="text-[9.5px] font-medium text-[#7A685B]">Trắng</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1.5">
+                        <span class="w-7 h-7 rounded-full bg-[#E8D5C4] border border-[#D5C0AD] shadow-xs"
+                            title="Be"></span>
+                        <span class="text-[9.5px] font-medium text-[#7A685B]">Be</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1.5">
+                        <span class="w-7 h-7 rounded-full bg-[#1F1F1F] border border-white/80 shadow-xs"
+                            title="Đen"></span>
+                        <span class="text-[9.5px] font-medium text-[#7A685B]">Đen</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1.5">
+                        <span class="w-7 h-7 rounded-full bg-[#F4B8C1] border border-white shadow-xs"
+                            title="Hồng"></span>
+                        <span class="text-[9.5px] font-medium text-[#7A685B]">Hồng</span>
+                    </div>
                 </div>
             </div>
 
@@ -1261,16 +1273,26 @@
     <!-- JAVASCRIPT LOGIC -->
     <script>
         /* ---------------- 1. AUTO-ADVANCING 3D COVERFLOW CAROUSEL ---------------- */
-        const photos = [
-            "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=700&q=80",
-            "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=700&q=80",
-            "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=700&q=80",
-            "https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=700&q=80",
-            "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=700&q=80",
-            "https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=700&q=80",
-            "https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=700&q=80",
-            "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=700&q=80"
+        const photoFiles = [
+            "center-image.jpg",
+            "QKAA8412.jpg",
+            "QKAA8480.jpg",
+            "QKAA8537.jpg",
+            "QKAA8623.jpg",
+            "QKAA8632.jpg",
+            "QKAA8732.jpg",
+            "QKAA8779.jpg",
+            "QKAA8910.jpg",
+            "QKAA8979.jpg",
+            "QKAA9231.jpg",
+            "QKAA9402.jpg",
+            "QKAA9409.jpg",
+            "QKAA9423.jpg",
+            "QKAA9493.jpg",
+            "QKAA9542.jpg"
         ];
+        const photos = photoFiles.map(file => `image-wedding/${file}`);
+        
         let currentIndex = 0;
         const stage = document.getElementById('carousel-stage');
         const counter = document.getElementById('slide-counter');
